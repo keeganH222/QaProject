@@ -1,0 +1,84 @@
+﻿@model QaProject.Models.Question
+
+@{
+    ViewBag.Title = "Post Your Question";
+}
+
+<h2>postQuestion</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Question</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label("Please Choose Your tags", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <button type="button" name="btnLink" id="btnLink" class="btn btn-primary" data-url="@Url.Action("addTag")">Open Pop</button>
+                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextArea("Description")
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Post" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+<div class="modal fade" id="ModalPopUp" role="dialog">
+</div>
+
+
+<script src="https://code.jquery.com/jquery-1.10.0.min.js"
+        integrity="sha256-2+LznWeWgL7AJ1ciaIG5rFP7GKemzzl+K75tRyTByOE="
+        crossorigin="anonymous"></script>
+<script>
+    $("#btnLink").click(function () {
+        var url = $(this).data('url');
+        $.get(url).done(data => {
+            $('#ModalPopUp').html(data);
+        });
+        $('#ModalPopUp').modal('show');
+    })
+    $("#btnSave").click(Save);
+    var arr = new Array();
+    function Save(e) {
+        var url = $('#btnSave').data('url');
+        $('.tags').each(function (e) {
+            if ($(this).prop('checked')) {
+                arr.push($(this).data('Id'));
+            }
+        });
+        var jsonObj = JSON.stringify(arr);
+        $.ajax({
+            type: 'Post',
+            url: url,
+            contentType: 'application/json',
+            data: jsonObj,
+            traditional: true
+        });
+    };
+</script>

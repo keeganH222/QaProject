@@ -1,0 +1,43 @@
+﻿@model QaProject.Models.Question
+@{
+    ViewBag.Title = "Question";
+}
+
+<main class="Question_Details">
+    <h2 class="Question_title">@Model.Title</h2>
+    <section class="Question_Content">
+    <div class="Scroll_Controller">@Model.Description</div>
+    <div class="Question_Comments">
+        @if (Model.Comments.Count > 0)
+        {
+            foreach (var comment in Model.Comments)
+            {
+                Html.Partial("Comment", comment);
+            }
+        }
+        <a class="CommentLink Question">Add a Comment</a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            @using (Html.BeginForm("AddComment", "HomeController", FormMethod.Post, new { @class = "hidden" }))
+            {
+                Html.Partial("AddComment", new QaProject.Models.Comment());
+            }
+        }
+    </div>
+    </section>
+    <section class="Answer_Container">
+        @if (Model.Answers.Count > 0)
+        {
+            foreach (var answer in Model.Answers)
+            {
+                Html.Partial("Answer", answer);
+            }
+        }
+        <a class="AnswerLink Question">Answer</a>
+        @using (Html.BeginForm("AddAnswer", "HomeController"))
+        {
+            Html.Partial("AddAnswer", new QaProject.Models.Answer());
+        }
+    </section>
+</main>
+

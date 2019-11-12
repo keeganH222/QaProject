@@ -1,0 +1,14 @@
+﻿@model QaProject.Models.Answer
+@{
+    Layout = null;
+}
+
+
+<div class="Answer">
+    <div class="Answer Vote">@Model.Votes</div>
+    <div class="Answer Content">@Model.Content</div>
+    <div class="Answer AuthorCtn">
+        <div class="Answer_Author">@Model.Owner.UserName</div>
+        <div class="Answer_Date">@Model.PostedOn</div>
+    </div>
+</div>

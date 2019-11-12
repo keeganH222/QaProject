@@ -1,0 +1,10 @@
+﻿@model QaProject.Models.Comment
+@{ 
+    Layout = null;
+}
+
+
+<div>
+    <textarea>@Html.EditorFor(model => model.Content)</textarea>
+    <input type="submit" value="Add Comment" />
+</div>

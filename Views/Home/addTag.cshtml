@@ -1,0 +1,36 @@
+﻿@model IEnumerable<QaProject.Models.TagViewModel>
+
+
+<div class="modal-dialog err-pop" style="">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button id="DivClose" type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+                <p>
+                    @Html.ActionLink("Create New Tag", "CreateTag")
+                </p>
+                <table class="table">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.tagName)
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.tagName)
+                            </td>
+                            <td>
+                                <input class="tags" type="checkbox" data-Id="@item.tagId" />
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <input id="btnSave" type="submit" onclick="Save()" value="save" data-url="saveTag"/>
+        </div>
+    </div>
+</div>
