@@ -3,6 +3,7 @@ using QaProject.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Services.Description;
@@ -12,6 +13,7 @@ namespace QaProject.Controllers
     public class HomeController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private QuestionHelper qh = new QuestionHelper();
         public ActionResult Index()
         {
             return View();
@@ -45,6 +47,8 @@ namespace QaProject.Controllers
                 question.Description = Description;
                 question.OwnerId = User.Identity.GetUserId();
                 question.PostedOn = DateTime.Now;
+                question.Tags = qh.getQuestionTags();
+                qh.removeTagArray();
                 db.Questions.Add(question);
                 db.SaveChanges();
                 return RedirectToAction("Question", new { id = question.Id });
@@ -106,7 +110,6 @@ namespace QaProject.Controllers
         {
             var tagList = db.Tags.ToList();
             List<TagViewModel> tags = new List<TagViewModel>();
-            ViewBag.selectedTags = new MultiSelectList("Tag Name", "Id");
             foreach(Tag tag in tagList)
             {
                 tags.Add(new TagViewModel { tagId = tag.Id,  tagName = tag.Name});
@@ -125,8 +128,14 @@ namespace QaProject.Controllers
             //var tagList = db.Tags.ToList();
             return View();
         }
+        [HttpPost]
         public JsonResult saveTag(IEnumerable<int> arrayOfIds)
         {
+            if(arrayOfIds != null)
+            {
+                int[] tagIds = arrayOfIds.ToArray();
+                qh.setTagIdArray(tagIds);
+            }
             return Json( JsonRequestBehavior.AllowGet);
         }
         public ActionResult Question(int id)

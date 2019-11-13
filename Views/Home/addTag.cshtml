@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<QaProject.Models.TagViewModel>
-
+@{
+    Layout=null;
+}
 
 <div class="modal-dialog err-pop" style="">
     <div class="modal-content">
@@ -25,7 +27,7 @@
                                 @Html.DisplayFor(modelItem => item.tagName)
                             </td>
                             <td>
-                                <input class="tags" type="checkbox" data-Id="@item.tagId" />
+                                <input class="tags" type="checkbox" data-Id="@item.tagId" data-Name="@item.tagName" value="@item.IsChecked"/>
                             </td>
                         </tr>
                     }

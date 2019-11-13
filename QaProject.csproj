@@ -183,6 +183,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
     <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\DataAccess.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Question.cs" />
@@ -263,10 +264,10 @@
     <Content Include="Views\Home\addTag.cshtml" />
     <Content Include="Views\Home\AddTagToQuestion.cshtml" />
     <Content Include="Views\Home\View.cshtml" />
+    <Content Include="Views\Good\postQuestion.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Good\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

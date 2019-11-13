@@ -26,7 +26,6 @@
             @Html.Label("Please Choose Your tags", new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <button type="button" name="btnLink" id="btnLink" class="btn btn-primary" data-url="@Url.Action("addTag")">Open Pop</button>
-                <div id="#DisplayTags"></div>
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -43,60 +42,48 @@
                 <input type="submit" value="Post" class="btn btn-default" />
             </div>
         </div>
+        }
+
+        <div>
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+        <div class="modal fade" id="ModalPopUp" role="dialog">
+        </div>
+
     </div>
-}
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
-<div class="modal fade" id="ModalPopUp" role="dialog">
-</div>
-
-
-<script src="https://code.jquery.com/jquery-1.10.0.min.js"
-        integrity="sha256-2+LznWeWgL7AJ1ciaIG5rFP7GKemzzl+K75tRyTByOE="
-        crossorigin="anonymous"></script>
-<script>
-    $("#btnLink").click(function () {
-        var url = $(this).data('url');
-        $.get(url).done(data => {
-            $('#ModalPopUp').html(data);
-        });
-        $('#ModalPopUp').modal('toggle');
-    })
-    $("#btnSave").click(Save);
-    var Idarr = new Array();
-    var NameArr = new Array();
-    function Save(e) {
-        var url = $('#btnSave').data('url');
-        $('.tags').each(function (e) {
-            if ($(this).prop('checked')) {
-                var unique = true;
-                Idarr.forEach(e => e === $(this).data('id') ? unique = false : 1 + 1);
-                if (unique) {
-                    Idarr.push($(this).data('id'));
-                    NameArr.push($(this).data('name'));
+    <script src="https://code.jquery.com/jquery-1.10.0.min.js"
+            integrity="sha256-2+LznWeWgL7AJ1ciaIG5rFP7GKemzzl+K75tRyTByOE="
+            crossorigin="anonymous"></script>
+    <script>
+        $("#btnLink").click(function () {
+            var url = $(this).data('url');
+            $.get(url).done(data => {
+                $('#ModalPopUp').html(data);
+            });
+            $('#ModalPopUp').modal('show');
+        })
+        $("#btnSave").click(Save);
+        var Idarr = new Array();
+        var NameArr = new Array();
+        function Save(e) {
+            var url = $('#btnSave').data('url');
+            $('.tags').each(function (e) {
+                if ($(this).prop('checked')) {
+                    Idarr.push($(this).data('Id'));
+                    NameArr.push($(this).data('Name'));
                 }
-            }
-        });
-        var jsonObj = JSON.stringify(Idarr);
-        $.ajax({
-            type: 'Post',
-            url: url,
-            contentType: 'application/json',
-            data: jsonObj,
-            traditional: true
-        }).catch((result) => {
-            alert(result);
-        }).done((result) => {
-            Display();
-        });
-        Display();
-    };
-    function Display() {
-        $('#DivClose').click();
-        NameArr.forEach((name) => {
-            $('#DisplayTags').append("<span class='shownTags'>" + name + "</span>");
-        });
-    };
-</script>
+            });
+            var jsonObj = JSON.stringify(Idarr);
+            $.ajax({
+                type: 'Post',
+                url: url,
+                contentType: 'application/json',
+                data: jsonObj,
+                traditional: true
+            });
+            $('#ModalPopUp').modal('hide');
+        };
+        function Display() {
+
+        };
+    </script>
