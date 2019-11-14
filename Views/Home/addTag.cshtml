@@ -1,25 +1,31 @@
 ﻿@model IEnumerable<QaProject.Models.TagViewModel>
 @{
-    Layout=null;
+    Layout = null;
 }
-
+@section Scripts {
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+}
 <div class="modal-dialog err-pop" style="">
     <div class="modal-content">
         <div class="modal-header">
             <button id="DivClose" type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body" style="text-align:center;">
-                <p>
-                    @Html.ActionLink("Create New Tag", "CreateTag")
-                </p>
-                <table class="table">
+            <p>
+                @Html.ActionLink("Create New Tag", "CreateTag")
+            </p>
+            <table class="table" id="userTable">
+                <thead>
                     <tr>
                         <th>
                             @Html.DisplayNameFor(model => model.tagName)
                         </th>
                         <th></th>
                     </tr>
+                </thead>
 
+                <tbody>
                     @foreach (var item in Model)
                     {
                         <tr>
@@ -27,12 +33,28 @@
                                 @Html.DisplayFor(modelItem => item.tagName)
                             </td>
                             <td>
-                                <input class="tags" type="checkbox" data-Id="@item.tagId" data-Name="@item.tagName" value="@item.IsChecked"/>
+                                @if (item.IsChecked)
+                                {
+                                    <input class="tags" type="checkbox" data-Id="@item.tagId" data-Name="@item.tagName" checked />
+                                }
+                                else
+                                {
+                                    <input class="tags" type="checkbox" data-Id="@item.tagId" data-Name="@item.tagName" />
+                                }
+
                             </td>
+
                         </tr>
                     }
-                </table>
-                <input id="btnSave" type="submit" onclick="Save()" value="save" data-url="saveTag"/>
+                </tbody>
+            </table>
+            <input id="btnSave" type="submit" onclick="Save()" value="save" data-url="saveTag" />
         </div>
     </div>
 </div>
+<script>
+
+    jQuery(document).ready(function () {
+        $('#userTable').dataTable();
+    });
+</script>

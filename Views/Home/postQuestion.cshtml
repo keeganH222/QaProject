@@ -26,7 +26,7 @@
             @Html.Label("Please Choose Your tags", new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <button type="button" name="btnLink" id="btnLink" class="btn btn-primary" data-url="@Url.Action("addTag")">Open Pop</button>
-                <div id="#DisplayTags"></div>
+                <div id="DisplayTags"></div>
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -57,16 +57,17 @@
         integrity="sha256-2+LznWeWgL7AJ1ciaIG5rFP7GKemzzl+K75tRyTByOE="
         crossorigin="anonymous"></script>
 <script>
-    $("#btnLink").click(function () {
+    jQuery("#btnLink").click(function () {       
         var url = $(this).data('url');
         $.get(url).done(data => {
             $('#ModalPopUp').html(data);
         });
         $('#ModalPopUp').modal('toggle');
     })
-    $("#btnSave").click(Save);
+    jQuery("#btnSave").click(Save);
     var Idarr = new Array();
     var NameArr = new Array();
+    var removeArr = new Array();
     function Save(e) {
         var url = $('#btnSave').data('url');
         $('.tags').each(function (e) {
@@ -77,6 +78,44 @@
                     Idarr.push($(this).data('id'));
                     NameArr.push($(this).data('name'));
                 }
+                let index = removeArr.indexOf($(this).data('name'));
+                if (index !== -1) {
+                    removeArr[index] = removeArr.pop();
+                }
+            }
+            else {
+                let index = removeArr.indexOf($(this).data('name'));
+                let Nameindex = NameArr.indexOf($(this).data('name'));
+                
+                if (index === -1) {
+                    removeArr.push($(this).data('name'));
+                }
+                if (Nameindex != -1) {
+                    
+                    if (Nameindex === NameArr.length - 1 && NameArr.length > 2) {
+                        alert("first test");
+                        NameArr[Nameindex] = NameArr.shift();
+                        Idarr[Nameindex] = Idarr.shift();
+                    }
+                    else if (NameArr.length === 2) {
+                        if (Nameindex === NameArr.length - 1) {
+                            alert("second test");
+                            NameArr.pop();
+                            Idarr.pop();
+                        }
+                        else {
+                            NameArr.shift();
+                            Idarr.shift();
+                        }
+                        
+                    }
+                    else {
+                        alert("third test");
+                        NameArr = new Array();
+                        Idarr = new Array();
+                    }
+                    
+                }
             }
         });
         var jsonObj = JSON.stringify(Idarr);
@@ -86,17 +125,29 @@
             contentType: 'application/json',
             data: jsonObj,
             traditional: true
-        }).catch((result) => {
-            alert(result);
         }).done((result) => {
             Display();
         });
-        Display();
     };
     function Display() {
         $('#DivClose').click();
+        var divDisplay = document.querySelector('#DisplayTags');
+        removeArr.forEach((name) => {
+
+            var tags = document.getElementsByClassName(name);
+            for (let i = 0; i < tags.length; i++) {
+
+                if (tags[i] !== undefined) {
+                    divDisplay.removeChild(tags[i]);
+                }
+            }
+        });
         NameArr.forEach((name) => {
-            $('#DisplayTags').append("<span class='shownTags'>" + name + "</span>");
+            var HaveYouBeenSelected = $("." + name);
+            if (!HaveYouBeenSelected.hasClass(name)) {
+                var span = $("<span class='shownTags'><button class='removeTag'>X</button></span>").text(name).addClass(name);
+                $('#DisplayTags').append(span);
+            }
         });
     };
 </script>

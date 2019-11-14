@@ -13,7 +13,7 @@ namespace QaProject.Controllers
     public class HomeController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-        private QuestionHelper qh = new QuestionHelper();
+        private static QuestionHelper qh = new QuestionHelper();
         public ActionResult Index()
         {
             return View();
@@ -112,7 +112,21 @@ namespace QaProject.Controllers
             List<TagViewModel> tags = new List<TagViewModel>();
             foreach(Tag tag in tagList)
             {
-                tags.Add(new TagViewModel { tagId = tag.Id,  tagName = tag.Name});
+                if(qh.TagIds != null)
+                {
+                    if (qh.TagIds.Contains(tag.Id))
+                    {
+                        tags.Add(new TagViewModel { tagId = tag.Id, tagName = tag.Name, IsChecked = true });
+                    }
+                    else
+                    {
+                        tags.Add(new TagViewModel { tagId = tag.Id, tagName = tag.Name });
+                    }
+                }
+                else
+                {
+                    tags.Add(new TagViewModel { tagId = tag.Id, tagName = tag.Name });
+                }
             }
             return View(tags);
         }
