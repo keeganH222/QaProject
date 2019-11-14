@@ -14,6 +14,7 @@ namespace QaProject.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private static QuestionHelper qh = new QuestionHelper();
+        private 
         public ActionResult Index()
         {
             return View();
@@ -131,24 +132,12 @@ namespace QaProject.Controllers
             return View(tags);
         }
         [HttpPost]
-        public ActionResult addTag(IEnumerable<int> arrayOfIds)
-        {
-            //var question = db.Questions.FirstOrDefault(q => q.Id == questionId);
-            //var tag = db.Tags.FirstOrDefault(t => t.Id == tagId);
-            //if(question != null && tag != null)
-            //{
-            //    question.Tags.Add(tag);
-            //}
-            //var tagList = db.Tags.ToList();
-            return View();
-        }
-        [HttpPost]
-        public JsonResult saveTag(IEnumerable<int> arrayOfIds)
+        public async Task<JsonResult> SaveTag(IEnumerable<int> arrayOfIds)
         {
             if(arrayOfIds != null)
             {
                 int[] tagIds = arrayOfIds.ToArray();
-                qh.setTagIdArray(tagIds);
+                await qh.SetTagIdArray(tagIds);
             }
             return Json( JsonRequestBehavior.AllowGet);
         }
@@ -157,6 +146,9 @@ namespace QaProject.Controllers
             var question = db.Questions.FirstOrDefault(q => q.Id == id);
             return View(question);
         }
+        public async Task<JsonResult> removeTag(string name)
+        {
 
+        }
     }
 }

@@ -145,9 +145,34 @@
         NameArr.forEach((name) => {
             var HaveYouBeenSelected = $("." + name);
             if (!HaveYouBeenSelected.hasClass(name)) {
-                var span = $("<span class='shownTags'><button class='removeTag'>X</button></span>").text(name).addClass(name);
+                var span = document.createElement("span");
+                var text = document.createTextNode(name);
+                span.append(text);
+                $(span).addClass('tagName');
+                var button = document.createElement('button');
+                var x = document.createTextNode('x');
+                button.append(x);
+                button.setAttribute('data-name', name);
+                button.setAttribute('data-url',@Html.Action("removeTag"));
+                $(button).addClass('removeTag');
+                span.append(button);
+                var divContainer = $("<div class='shownTags'></div>").html(span);
                 $('#DisplayTags').append(span);
             }
         });
+        $('.removeTag').click(removeTag);
     };
+    function removeTag(e) {
+        let TagName = $(this).data('name');
+        let url = $(this).data('url');
+        let jsonObj = JSON.stringify(TagName);
+        $.ajax({
+            url: url,
+            contentType: 'application/json',
+            data: jsonObj,
+            traditional: true
+        }).done(() => {
+
+        });
+    }
 </script>

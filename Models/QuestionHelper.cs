@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace QaProject.Models
@@ -15,7 +16,7 @@ namespace QaProject.Models
         }
         public List<Tag> tagList { get; set; }
         public int[] TagIds { get; set; }
-        public void setTagIdArray(int[] tagId)
+        public async Task SetTagIdArray(int[] tagId)
         {
             this.TagIds = tagId;
         }
