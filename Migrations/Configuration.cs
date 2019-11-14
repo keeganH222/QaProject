@@ -4,6 +4,8 @@ namespace QaProject.Migrations
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.EntityFramework;
     using QaProject.Models;
     internal sealed class Configuration : DbMigrationsConfiguration<QaProject.Models.ApplicationDbContext>
     {
@@ -26,6 +28,20 @@ namespace QaProject.Migrations
                 new Tag { Name = "Python"},
                 new Tag { Name = "PHP"}
                 );
+
+            var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
+            var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+
+            if (!RoleManager.RoleExists("Admin"))
+            {
+                RoleManager.Create(new IdentityRole("Admin"));
+            }
+            if (!context.Users.Any(u => u.UserName == "Admin@test.com"))
+            {
+                ApplicationUser Admin = new ApplicationUser { UserName = "Admin@test.com", Email = "Admin@test.com" };
+                UserManager.Create(Admin, "EntityFr@mew0rk");
+                UserManager.AddToRole(Admin.Id, "Admin");
+            }
         }
     }
 }
