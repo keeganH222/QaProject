@@ -5,10 +5,9 @@ using System.Web;
 
 namespace QaProject.Models
 {
-    public interface IDataAccess
+     interface IDataAccess
     {
-        public List<Tag> getTagList();
-        public List<>
+        List<Tag> getTagList();
     }
     public class DataAccess
     {
