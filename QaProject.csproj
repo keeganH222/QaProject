@@ -179,16 +179,22 @@
     <Compile Include="Migrations\201911072025398_intial.Designer.cs">
       <DependentUpon>201911072025398_intial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201911152036218_add-votes.cs" />
+    <Compile Include="Migrations\201911152036218_add-votes.Designer.cs">
+      <DependentUpon>201911152036218_add-votes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\DataAccess.cs" />
+    <Compile Include="Models\DownVote.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Question.cs" />
     <Compile Include="Models\QuestionHelper.cs" />
     <Compile Include="Models\Tag.cs" />
+    <Compile Include="Models\UpVote.cs" />
     <Compile Include="Models\UserHelper.cs" />
     <Compile Include="Models\ViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -220,6 +226,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\questionFunction.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -269,6 +276,9 @@
     <Content Include="Views\Home\AddTagToQuestion.cshtml" />
     <Content Include="Views\Home\View.cshtml" />
     <Content Include="Views\Good\postQuestion.cshtml" />
+    <Content Include="Views\Good\AddTag.cshtml" />
+    <Content Include="Views\Home\CreateTag.cshtml" />
+    <Content Include="Views\Home\MainPage.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -290,6 +300,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201911072025398_intial.resx">
       <DependentUpon>201911072025398_intial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911152036218_add-votes.resx">
+      <DependentUpon>201911152036218_add-votes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

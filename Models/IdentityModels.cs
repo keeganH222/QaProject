@@ -15,10 +15,16 @@ namespace QaProject.Models
             this.Questions = new List<Question>();
             this.Answers = new List<Answer>();
             this.Comments = new List<Comment>();
+            this.UpVotes = new List<UpVote>();
+            this.DownVotes = new List<DownVote>();
+            this.Reputation = 50;
         }
+        public int Reputation { get; set; }
         public ICollection<Question> Questions { get; set; }
         public ICollection<Answer> Answers { get; set; }
         public ICollection<Comment> Comments { get; set; }
+        public ICollection<UpVote> UpVotes { get; set; }
+        public ICollection<DownVote> DownVotes { get; set; }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
@@ -34,6 +40,8 @@ namespace QaProject.Models
         public DbSet<Answer> Answers { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<UpVote> UpVotes { get; set; }
+        public DbSet<DownVote> DownVotes { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

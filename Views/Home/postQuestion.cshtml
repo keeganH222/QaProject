@@ -7,7 +7,11 @@
 <h2>postQuestion</h2>
 
 
-@using (Html.BeginForm())
+
+    <div id="DisplayTags"></div>
+
+
+@using (Html.BeginForm("createQuestion", "Home"))
 {
     @Html.AntiForgeryToken()
 
@@ -26,7 +30,7 @@
             @Html.Label("Please Choose Your tags", new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <button type="button" name="btnLink" id="btnLink" class="btn btn-primary" data-url="@Url.Action("addTag")">Open Pop</button>
-                <div id="DisplayTags"></div>
+
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -53,17 +57,17 @@
 </div>
 
 
-<script src="https://code.jquery.com/jquery-1.10.0.min.js"
+@*<script src="https://code.jquery.com/jquery-1.10.0.min.js"
         integrity="sha256-2+LznWeWgL7AJ1ciaIG5rFP7GKemzzl+K75tRyTByOE="
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>*@
 <script>
-    jQuery("#btnLink").click(function () {       
+    jQuery("#btnLink").click(function () {
         var url = $(this).data('url');
         $.get(url).done(data => {
             $('#ModalPopUp').html(data);
         });
         $('#ModalPopUp').modal('toggle');
-    })
+    });
     jQuery("#btnSave").click(Save);
     var Idarr = new Array();
     var NameArr = new Array();
@@ -86,12 +90,12 @@
             else {
                 let index = removeArr.indexOf($(this).data('name'));
                 let Nameindex = NameArr.indexOf($(this).data('name'));
-                
+
                 if (index === -1) {
                     removeArr.push($(this).data('name'));
                 }
                 if (Nameindex != -1) {
-                    
+
                     if (Nameindex === NameArr.length - 1 && NameArr.length > 2) {
                         alert("first test");
                         NameArr[Nameindex] = NameArr.shift();
@@ -107,14 +111,14 @@
                             NameArr.shift();
                             Idarr.shift();
                         }
-                        
+
                     }
                     else {
                         alert("third test");
                         NameArr = new Array();
                         Idarr = new Array();
                     }
-                    
+
                 }
             }
         });
@@ -149,14 +153,14 @@
                 var text = document.createTextNode(name);
                 span.append(text);
                 $(span).addClass('tagName');
+                $(span).addClass(name);
                 var button = document.createElement('button');
                 var x = document.createTextNode('x');
                 button.append(x);
                 button.setAttribute('data-name', name);
-                button.setAttribute('data-url',@Html.Action("removeTag"));
+                button.setAttribute('data-url','@Url.Action("removeTag")');
                 $(button).addClass('removeTag');
                 span.append(button);
-                var divContainer = $("<div class='shownTags'></div>").html(span);
                 $('#DisplayTags').append(span);
             }
         });
@@ -165,14 +169,16 @@
     function removeTag(e) {
         let TagName = $(this).data('name');
         let url = $(this).data('url');
-        let jsonObj = JSON.stringify(TagName);
+        var obj = { TagName: TagName }
+        let jsonObj = JSON.stringify({ TagName: TagName });
         $.ajax({
             url: url,
-            contentType: 'application/json',
+            type: 'POST',
+            contentType: "application/json",
             data: jsonObj,
             traditional: true
         }).done(() => {
-
+            $('.' + TagName).remove();
         });
-    }
+    };
 </script>

@@ -14,7 +14,11 @@ namespace QaProject.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private static QuestionHelper qh = new QuestionHelper();
-        private 
+        private QALogic qaLogic;
+        public HomeController()
+        {
+            qaLogic = new QALogic(new GeneralDataAccess());
+        }
         public ActionResult Index()
         {
             return View();
@@ -33,6 +37,7 @@ namespace QaProject.Controllers
 
             return View();
         }
+        //Create question
         [Authorize]
         public ActionResult postQuestion()
         {
@@ -48,6 +53,7 @@ namespace QaProject.Controllers
                 question.Description = Description;
                 question.OwnerId = User.Identity.GetUserId();
                 question.PostedOn = DateTime.Now;
+                //Ajax requests have saved user select tags, must retrieve them from an object helper
                 question.Tags = qh.getQuestionTags();
                 qh.removeTagArray();
                 db.Questions.Add(question);
@@ -106,7 +112,7 @@ namespace QaProject.Controllers
             }
             return View();
         }
-        
+        //getting list of tag for a user to select
         public ActionResult addTag()
         {
             var tagList = db.Tags.ToList();
@@ -131,6 +137,18 @@ namespace QaProject.Controllers
             }
             return View(tags);
         }
+        //to let the user create a tag
+        [HttpPost]
+        public JsonResult CreateTag(String tagName)
+        {
+            Tag tag = null;
+            if (!string.IsNullOrEmpty(tagName))
+            {
+                qaLogic.HandleSaveTagLogica(tagName);
+                tag = qaLogic.HandleGetTag(tagName);
+            }
+            return Json(tag.Id, JsonRequestBehavior.AllowGet);
+        }
         [HttpPost]
         public async Task<JsonResult> SaveTag(IEnumerable<int> arrayOfIds)
         {
@@ -146,9 +164,80 @@ namespace QaProject.Controllers
             var question = db.Questions.FirstOrDefault(q => q.Id == id);
             return View(question);
         }
-        public async Task<JsonResult> removeTag(string name)
+        [HttpPost]
+        public async Task<JsonResult> removeTag(string TagName)
         {
-
+            var task = await Task.Run(() => qh.RemoveSpecificTag(TagName));
+            return Json(JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult MainPage()
+        {
+            var questionList = qaLogic.HandleQuestionListLogic("retieve list");
+            return View(questionList.OrderByDescending(q => q.PostedOn));
+        }
+        public ActionResult TagList()
+        {
+            var tagList = qaLogic.HandleTagListLogic("Retrive list").ToList();
+            return View(tagList);
+        }
+        public ActionResult ListOfTagsQuestions(string tagName)
+        {
+            var tag = qaLogic.HandleGetTag(tagName);
+            if(tag == null)
+            {
+                return HttpNotFound();
+            }
+            return View("MainPage", tag.Questions);
+        }
+        public async Task<JsonResult> UpVoteItem(string itemType, int itemId, string userId)
+        {
+            var result = Task.Run(() =>
+            {
+                UpVote upVote = null;
+                if (itemType == "question")
+                {
+                    var question = qaLogic.HandleGetQuestion(itemId);
+                    if (question != null)
+                    {
+                        upVote = new UpVote { questionId = itemId, userId = userId };
+                    }
+                }
+                else
+                {
+                    var answer = qaLogic.HandleGetAnswer(itemId);
+                    if (answer != null)
+                    {
+                        upVote = new UpVote { answerId = itemId, userId = userId };
+                    }
+                }
+                qaLogic.HandleSaveUpVote(upVote);
+            });
+            return Json(JsonRequestBehavior.AllowGet);
+        }
+        public async Task<JsonResult> DownVoteItem(string itemType, int itemId, string userId)
+        {
+            var result = Task.Run(() =>
+            {
+                UpVote upVote = null;
+                if (itemType == "question")
+                {
+                    var question = qaLogic.HandleGetQuestion(itemId);
+                    if (question != null)
+                    {
+                        upVote = new UpVote { questionId = itemId, userId = userId };
+                    }
+                }
+                else
+                {
+                    var answer = qaLogic.HandleGetAnswer(itemId);
+                    if (answer != null)
+                    {
+                        upVote = new UpVote { answerId = itemId, userId = userId };
+                    }
+                }
+                qaLogic.HandleSaveUpVote(upVote);
+            });
+            return Json(JsonRequestBehavior.AllowGet);
         }
     }
 }

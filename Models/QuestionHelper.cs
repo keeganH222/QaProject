@@ -42,5 +42,21 @@ namespace QaProject.Models
             return taglist;
             
         }
+        public bool RemoveSpecificTag(string tagName)
+        {
+            var tag = db.Tags.FirstOrDefault(t => t.Name == tagName);
+            if(tagName == null)
+            {
+                return false;
+            }
+            int tagId = tag.Id;
+            var tagIds = TagIds.ToList();
+            if(!tagIds.Remove(tagId))
+            {
+                return false;
+            }
+            this.TagIds = tagIds.ToArray();
+            return true;
+        }
     }
 }

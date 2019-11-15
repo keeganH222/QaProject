@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using System.Web.Mvc;
+using System.Threading.Tasks;
 
 namespace QaProject.Models
 {
@@ -16,12 +17,15 @@ namespace QaProject.Models
         List<Question> getQuestionList(string uid);
         List<Comment> getCommentList(string uid);
         List<Answer> getAnswerList(string uid);
-        bool saveTag(Tag tag);
+        void saveTag(string tag);
         bool saveQuestion(Question question);
         bool saveAnswer(Answer answer);
         bool saveComment(Comment comment);
-        
-
+        void saveUpVote(UpVote upVote);
+        void saveDownVote(DownVote downVote);
+        Tag getSpecificTag(string TagName);
+        Question getQuestion(int id);
+        Answer getAnswer(int id);
     }
     class QALogic
     {
@@ -47,9 +51,17 @@ namespace QaProject.Models
         {
             return dta.getAnswerList(uid);
         }
-        public bool HandleSaveTagLogica(Tag tag)
+        public bool HandleSaveTagLogica(string tag)
         {
-            return dta.saveTag(tag);
+            try
+            {
+                dta.saveTag(tag);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
         public bool HandleSaveQuestionLogic(Question question)
         {
@@ -63,13 +75,32 @@ namespace QaProject.Models
         {
             return dta.saveAnswer(answer);
         }
-
+        public Tag HandleGetTag(string tagName)
+        {
+            return dta.getSpecificTag(tagName);
+        }
+        public Question HandleGetQuestion(int id)
+        {
+            return dta.getQuestion(id);
+        }
+        public Answer HandleGetAnswer(int id)
+        {
+            return dta.getAnswer(id);
+        }
+        public void HandleSaveUpVote(UpVote upVote)
+        {
+            dta.saveUpVote(upVote);
+        }
+        public void HandleSaveDownVote(DownVote downVote)
+        {
+            dta.saveDownVote(downVote);
+        }
     }
-    
+
     class GeneralDataAccess : IDataAccess
     {
         ApplicationDbContext db = new ApplicationDbContext();
-       
+
         public List<Question> getQuestionList(string uid)
         {
             return db.Questions.ToList();
@@ -85,8 +116,8 @@ namespace QaProject.Models
         public List<Comment> getCommentList(string uid)
         {
             return db.Comments.ToList();
-        } 
-        
+        }
+
         public bool saveQuestion(Question question)
         {
             if (!String.IsNullOrEmpty(question.Description))
@@ -97,16 +128,21 @@ namespace QaProject.Models
             }
             return false;
         }
-        public bool saveTag(Tag tag)
+        public void saveTag(string tag)
         {
-            if (!String.IsNullOrEmpty(tag.Name))
+            if (!String.IsNullOrEmpty(tag))
             {
-                db.Tags.Add(tag);
-                db.SaveChanges();
-                return true;
+                var tagNames = db.Tags.Select(t => t.Name).Distinct().ToList();
+                int index = tagNames.IndexOf(tag);
+                if(index == -1)
+                {
+                    Tag tagToSave = new Tag { Name = tag };
+                    db.Tags.Add(tagToSave);
+                    db.SaveChanges();
+                }
             }
-            return false;
-            
+            throw new KeyNotFoundException("Empty Tag Name was entered");
+
         }
         public bool saveAnswer(Answer answer)
         {
@@ -128,11 +164,39 @@ namespace QaProject.Models
             }
             return false;
         }
+
+        public Tag getSpecificTag(string tagName)
+        {
+            var tag = db.Tags.FirstOrDefault(t => t.Name == tagName);
+            return tag;
+        }
+
+        public Question getQuestion(int id)
+        {
+            var question = db.Questions.FirstOrDefault(q => q.Id == id);
+            return question;
+        }
+
+        public Answer getAnswer(int id)
+        {
+            var answer = db.Answers.FirstOrDefault(a => a.Id == id);
+            return answer;
+        }
+        public void saveUpVote(UpVote upVote)
+        {
+            db.UpVotes.Add(upVote);
+            db.SaveChanges();
+        }
+        public void saveDownVote(DownVote downVote)
+        {
+            db.DownVotes.Add(downVote);
+            db.SaveChanges();
+        }
     }
     class UserDataAccess : IDataAccess
     {
         ApplicationDbContext db = new ApplicationDbContext();
-        
+
         public List<Question> getQuestionList(string uid)
         {
             var user = db.Users.FirstOrDefault(x => x.Id == uid);
@@ -148,13 +212,13 @@ namespace QaProject.Models
             var tagList = new List<Tag>();
             foreach (var question in questionList)
             {
-                
+
                 var userTagList = question.Tags.ToList();
                 foreach (var tag in userTagList)
                 {
                     tagList.Add(tag);
                 }
-                
+
             }
             return tagList;
         }
@@ -181,15 +245,20 @@ namespace QaProject.Models
             }
             return false;
         }
-        public bool saveTag(Tag tag)
+        public void saveTag(string tag)
         {
-            if (!String.IsNullOrEmpty(tag.Name))
+            if (!String.IsNullOrEmpty(tag))
             {
-                db.Tags.Add(tag);
-                db.SaveChanges();
-                return true;
+                var tagNames = db.Tags.Select(t => t.Name).Distinct().ToList();
+                int index = tagNames.IndexOf(tag);
+                if (index == -1)
+                {
+                    Tag tagToSave = new Tag { Name = tag };
+                    db.Tags.Add(tagToSave);
+                    db.SaveChanges();
+                }
             }
-            return false;
+            throw new KeyNotFoundException("Empty Tag Name was entered");
         }
         public bool saveAnswer(Answer answer)
         {
@@ -210,6 +279,32 @@ namespace QaProject.Models
                 return true;
             }
             return false;
+        }
+        public Tag getSpecificTag(string tagName)
+        {
+            var tag = db.Tags.FirstOrDefault(t => t.Name == tagName);
+            return tag;
+        }
+        public Question getQuestion(int id)
+        {
+            var question = db.Questions.FirstOrDefault(q => q.Id == id);
+            return question;
+        }
+
+        public Answer getAnswer(int id)
+        {
+            var answer = db.Answers.FirstOrDefault(a => a.Id == id);
+            return answer;
+        }
+        public void saveUpVote(UpVote upVote)
+        {
+            db.UpVotes.Add(upVote);
+            db.SaveChanges();
+        }
+        public void saveDownVote(DownVote downVote)
+        {
+            db.DownVotes.Add(downVote);
+            db.SaveChanges();
         }
     }
 }

@@ -13,10 +13,11 @@
         </div>
         <div class="modal-body" style="text-align:center;">
             <a href="#" class="createTag">Create a Tag</a>
-            <div class="tagForm hidden">
-                <input type="text" class="tagName" />
-                <button class="btn" id="createTagBtn" data-url="@Url.Action("CreateTag", "Home")" value="Create Tag" />
-            </div>
+            @using (Html.BeginForm("CreateTag", "Home", FormMethod.Post, new { @class = "tagForm hidden" }))
+            {
+                @Html.TextBox("tagName", null, new { @class = "tagName" });
+                <input type="submit" class="btn" id="createTagBtn" data-url="@Url.Action("CreateTag")" value="Create Tag" />
+            }
 
 
 
@@ -60,19 +61,7 @@
 <script>
     jQuery('#createTagBtn').click((e) => {
         let tagName = $('.tagName').val();
-        let url = "/Home/CreateTag";
-        let jsonObj = JSON.stringify({ tagName: tagName});
-        $.ajax({
-            type: "POST",
-            url: url,
-            contentType: "application/json",
-            data: jsonObj,
-            traditional: true
-        }).done((e) => {
-            let tagId = JSON.parse(e);
-            alert(tagId);
-            AddTag(tagId, tagName)
-        });
+        let url = $(this).data('url');
     });
     jQuery('.createTag').click(() => {
         $('.tagForm').removeClass('hidden');
@@ -83,15 +72,4 @@
         $.noConflict();
         $('#userTable').dataTable();
     });
-    function AddTag(tagId, tagName) {
-        let tr = $("<tr></tr>");
-        let Nametd = $("<td></td>");
-        let Checktd = $("<td></td>");
-        let span = $("<span></span>").text(tagName);
-        let checkBoxInput = $("<input class='tags' type='checkbox' checked/>").attr("Data-id", tagId).attr("Data-name", tagName);
-        Nametd.append(span);
-        Checktd.append(checkBoxInput);
-        tr.append(Nametd).append(Checktd);
-        $("tbody").prepend(tr);
-    };
 </script>

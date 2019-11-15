@@ -1,0 +1,73 @@
+﻿@model IEnumerable<QaProject.Models.Question>
+
+@{
+    ViewBag.Title = "MainPage";
+    Layout = "~/Views/Shared/ModalLayout.cshtml";
+}
+@section Scripts {
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+}
+
+
+<h2>MainPage</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Owner.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Votes)
+            </th>
+            <th>
+                @Html.DisplayName("Tags")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PostedOn)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Owner.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Votes)
+                </td>
+                <td>
+                    <div class="questionTags">
+                        @foreach(var tags in item.Tags)
+                        {
+                            <p>
+                                @Html.DisplayFor(modelItem => tags)
+                            </p>
+                        }
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PostedOn)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Question", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
