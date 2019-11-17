@@ -6,24 +6,33 @@
 <main class="Question_Details">
     <h2 class="Question_title">@Model.Title</h2>
     <section class="Question_Content">
-    <div class="Scroll_Controller">@Model.Description</div>
-    <div class="Question_Comments">
-        @if (Model.Comments.Count > 0)
-        {
-            foreach (var comment in Model.Comments)
+        <div class="Scroll_Controller">@Model.Description</div>
+        <div class="tagContainer">
+            @foreach (var tag in Model.Tags)
             {
-                Html.Partial("Comment", comment);
+                <span class="shownTags">
+                    @tag.Name
+                </span>
             }
-        }
-        <a class="CommentLink Question">Add a Comment</a>
-        @if (User.Identity.IsAuthenticated)
-        {
-            @using (Html.BeginForm("AddComment", "HomeController", FormMethod.Post, new { @class = "hidden" }))
+        </div>
+        
+        <div class="Question_Comments">
+            @if (Model.Comments.Count > 0)
             {
-                Html.Partial("AddComment", new QaProject.Models.Comment());
+                foreach (var comment in Model.Comments)
+                {
+                    Html.Partial("Comment", comment);
+                }
             }
-        }
-    </div>
+            <a class="CommentLink Question">Add a Comment</a>
+            @if (User.Identity.IsAuthenticated)
+            {
+                using (Html.BeginForm("AddComment", "HomeController", FormMethod.Post, new { @class = "hidden" }))
+                {
+                    Html.Partial("AddComment", new QaProject.Models.Comment());
+                }
+            }
+        </div>
     </section>
     <section class="Answer_Container">
         @if (Model.Answers.Count > 0)

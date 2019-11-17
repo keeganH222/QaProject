@@ -273,12 +273,12 @@
     <Content Include="Views\Home\Answer.cshtml" />
     <Content Include="Views\Home\AddAnswer.cshtml" />
     <Content Include="Views\Home\addTag.cshtml" />
-    <Content Include="Views\Home\AddTagToQuestion.cshtml" />
     <Content Include="Views\Home\View.cshtml" />
     <Content Include="Views\Good\postQuestion.cshtml" />
     <Content Include="Views\Good\AddTag.cshtml" />
     <Content Include="Views\Home\CreateTag.cshtml" />
     <Content Include="Views\Home\MainPage.cshtml" />
+    <Content Include="Views\Home\createQuestion.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

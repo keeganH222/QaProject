@@ -13,11 +13,11 @@ namespace QaProject.Controllers
     public class HomeController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-        private static QuestionHelper qh = new QuestionHelper();
+        private static QuestionHelper questionHelper = new QuestionHelper();
         private QALogic qaLogic;
         public HomeController()
         {
-            qaLogic = new QALogic(new GeneralDataAccess());
+            qaLogic = new QALogic(new GeneralDataAccess(db));
         }
         public ActionResult Index()
         {
@@ -46,7 +46,7 @@ namespace QaProject.Controllers
         }
         [HttpPost]
         [ActionName("postQuestion")]
-        public ActionResult CreateQuestion([Bind(Include = "Title")] Question question, string Description)
+        public ActionResult createQuestion([Bind(Include = "Title")] Question question, string Description)
         {
             if (ModelState.IsValid)
             {
@@ -54,10 +54,11 @@ namespace QaProject.Controllers
                 question.OwnerId = User.Identity.GetUserId();
                 question.PostedOn = DateTime.Now;
                 //Ajax requests have saved user select tags, must retrieve them from an object helper
-                question.Tags = qh.getQuestionTags();
-                qh.removeTagArray();
-                db.Questions.Add(question);
-                db.SaveChanges();
+                var tagsToAdd = questionHelper.getQuestionTags();
+                questionHelper.removeTagArray();
+                //db.Entry(question).State = System.Data.Entity.EntityState.Detached;
+                qaLogic.HandleSaveQuestionLogic(question);
+                qaLogic.HandleAddTagsToQuestion(question, tagsToAdd);
                 return RedirectToAction("Question", new { id = question.Id });
             }
             ViewBag.Description = "";
@@ -106,8 +107,7 @@ namespace QaProject.Controllers
                 {
                     answer.QuestionId = id;
                     answer.PostedOn = DateTime.Now;
-                    db.Answers.Add(answer);
-                    db.SaveChanges();
+                    qaLogic.HandleSaveAnswerLogic(answer);
                 }
             }
             return View();
@@ -119,9 +119,9 @@ namespace QaProject.Controllers
             List<TagViewModel> tags = new List<TagViewModel>();
             foreach(Tag tag in tagList)
             {
-                if(qh.TagIds != null)
+                if(questionHelper.TagIds != null)
                 {
-                    if (qh.TagIds.Contains(tag.Id))
+                    if (questionHelper.TagIds.Contains(tag.Id))
                     {
                         tags.Add(new TagViewModel { tagId = tag.Id, tagName = tag.Name, IsChecked = true });
                     }
@@ -155,7 +155,7 @@ namespace QaProject.Controllers
             if(arrayOfIds != null)
             {
                 int[] tagIds = arrayOfIds.ToArray();
-                await qh.SetTagIdArray(tagIds);
+                await Task.Run(() => questionHelper.SetTagIdArray(tagIds));
             }
             return Json( JsonRequestBehavior.AllowGet);
         }
@@ -167,7 +167,7 @@ namespace QaProject.Controllers
         [HttpPost]
         public async Task<JsonResult> removeTag(string TagName)
         {
-            var task = await Task.Run(() => qh.RemoveSpecificTag(TagName));
+            var task = await Task.Run(() => questionHelper.RemoveSpecificTag(TagName));
             return Json(JsonRequestBehavior.AllowGet);
         }
         public ActionResult MainPage()
@@ -191,15 +191,17 @@ namespace QaProject.Controllers
         }
         public async Task<JsonResult> UpVoteItem(string itemType, int itemId, string userId)
         {
-            var result = Task.Run(() =>
+            await Task.Run(() =>
             {
                 UpVote upVote = null;
+                string originalQuestionUserId = "";
                 if (itemType == "question")
                 {
                     var question = qaLogic.HandleGetQuestion(itemId);
                     if (question != null)
                     {
                         upVote = new UpVote { questionId = itemId, userId = userId };
+                        originalQuestionUserId = question.OwnerId;
                     }
                 }
                 else
@@ -208,23 +210,28 @@ namespace QaProject.Controllers
                     if (answer != null)
                     {
                         upVote = new UpVote { answerId = itemId, userId = userId };
+                        originalQuestionUserId = answer.OwnerId;
                     }
                 }
                 qaLogic.HandleSaveUpVote(upVote);
+                qaLogic.HandleUpdateReputation(originalQuestionUserId, 5);
             });
             return Json(JsonRequestBehavior.AllowGet);
         }
         public async Task<JsonResult> DownVoteItem(string itemType, int itemId, string userId)
         {
-            var result = Task.Run(() =>
+            await Task.Run(() =>
             {
                 UpVote upVote = null;
+                string originalQuestionUserId = "";
                 if (itemType == "question")
                 {
                     var question = qaLogic.HandleGetQuestion(itemId);
+                    
                     if (question != null)
                     {
                         upVote = new UpVote { questionId = itemId, userId = userId };
+                        originalQuestionUserId = question.OwnerId;
                     }
                 }
                 else
@@ -233,9 +240,11 @@ namespace QaProject.Controllers
                     if (answer != null)
                     {
                         upVote = new UpVote { answerId = itemId, userId = userId };
+                        originalQuestionUserId = answer.OwnerId;
                     }
                 }
                 qaLogic.HandleSaveUpVote(upVote);
+                qaLogic.HandleUpdateReputation(originalQuestionUserId, -5);
             });
             return Json(JsonRequestBehavior.AllowGet);
         }

@@ -11,7 +11,7 @@
     <div id="DisplayTags"></div>
 
 
-@using (Html.BeginForm("createQuestion", "Home"))
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
 
@@ -169,7 +169,6 @@
     function removeTag(e) {
         let TagName = $(this).data('name');
         let url = $(this).data('url');
-        var obj = { TagName: TagName }
         let jsonObj = JSON.stringify({ TagName: TagName });
         $.ajax({
             url: url,

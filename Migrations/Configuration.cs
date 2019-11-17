@@ -20,14 +20,7 @@ namespace QaProject.Migrations
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data.
-            context.Tags.AddOrUpdate(
-                new Tag { Name = "Java"},
-                new Tag { Name = "JavaScript"},
-                new Tag { Name = "C#"},
-                new Tag { Name = "C++"},
-                new Tag { Name = "Python"},
-                new Tag { Name = "PHP"}
-                );
+            
 
             var RoleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
             var UserManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
@@ -41,6 +34,17 @@ namespace QaProject.Migrations
                 ApplicationUser Admin = new ApplicationUser { UserName = "Admin@test.com", Email = "Admin@test.com" };
                 UserManager.Create(Admin, "EntityFr@mew0rk");
                 UserManager.AddToRole(Admin.Id, "Admin");
+            }
+            if(context.Tags.Count() == 0)
+            {
+                context.Tags.AddOrUpdate(
+                new Tag { Name = "Java" },
+                new Tag { Name = "JavaScript" },
+                new Tag { Name = "C#" },
+                new Tag { Name = "C++" },
+                new Tag { Name = "Python" },
+                new Tag { Name = "PHP" }
+                );
             }
         }
     }

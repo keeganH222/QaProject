@@ -14,9 +14,10 @@ namespace QaProject.Models
             this.tagList = new List<Tag>();
             this.tagList = db.Tags.ToList();
         }
+        
         public List<Tag> tagList { get; set; }
         public int[] TagIds { get; set; }
-        public async Task SetTagIdArray(int[] tagId)
+        public void SetTagIdArray(int[] tagId)
         {
             this.TagIds = tagId;
         }
@@ -28,18 +29,9 @@ namespace QaProject.Models
         {
             this.tagList = db.Tags.ToList();
         }
-        public List<Tag> getQuestionTags()
+        public int[] getQuestionTags()
         {
-            List<Tag> taglist = new List<Tag>();
-            foreach(var tagId in this.TagIds)
-            {
-                var tag = this.tagList.FirstOrDefault(t => t.Id == tagId);
-                if(tag != null)
-                {
-                    tagList.Add(tag); 
-                }
-            }
-            return taglist;
+            return this.TagIds;
             
         }
         public bool RemoveSpecificTag(string tagName)

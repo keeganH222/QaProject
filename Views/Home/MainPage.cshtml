@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title = "MainPage";
-    Layout = "~/Views/Shared/ModalLayout.cshtml";
 }
 @section Scripts {
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
@@ -15,7 +14,7 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
+<table class="table" id="userTable">
     <thead>
         <tr>
             <th>
@@ -23,9 +22,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Votes)
             </th>
             <th>
                 @Html.DisplayName("Tags")
@@ -48,14 +44,11 @@
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Votes)
-                </td>
-                <td>
                     <div class="questionTags">
                         @foreach(var tags in item.Tags)
                         {
                             <p>
-                                @Html.DisplayFor(modelItem => tags)
+                                @Html.ActionLink(tags.Name, "ListOfTagsQuestions", new { tagName = tags.Name })
                             </p>
                         }
                     </div>
@@ -71,3 +64,10 @@
     </tbody>
 
 </table>
+
+
+<script>
+    jQuery(document).ready(function () {
+        $('#userTable').dataTable();
+    });
+</script>

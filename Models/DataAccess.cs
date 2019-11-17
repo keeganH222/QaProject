@@ -17,6 +17,7 @@ namespace QaProject.Models
         List<Question> getQuestionList(string uid);
         List<Comment> getCommentList(string uid);
         List<Answer> getAnswerList(string uid);
+        void addTagsToQuestion(Question question, int[] tags);
         void saveTag(string tag);
         bool saveQuestion(Question question);
         bool saveAnswer(Answer answer);
@@ -26,6 +27,7 @@ namespace QaProject.Models
         Tag getSpecificTag(string TagName);
         Question getQuestion(int id);
         Answer getAnswer(int id);
+        void updateUserReputation(string userId, int repToAdd);
     }
     class QALogic
     {
@@ -95,11 +97,23 @@ namespace QaProject.Models
         {
             dta.saveDownVote(downVote);
         }
+        public void HandleAddTagsToQuestion(Question question, int[] tags)
+        {
+            dta.addTagsToQuestion(question, tags);
+        }
+        public void HandleUpdateReputation(string userId, int repToAdd)
+        {
+            dta.updateUserReputation(userId, repToAdd);
+        }
     }
 
     class GeneralDataAccess : IDataAccess
     {
-        ApplicationDbContext db = new ApplicationDbContext();
+        ApplicationDbContext db;
+        public GeneralDataAccess(ApplicationDbContext db)
+        {
+            this.db = db;
+        }
 
         public List<Question> getQuestionList(string uid)
         {
@@ -192,10 +206,39 @@ namespace QaProject.Models
             db.DownVotes.Add(downVote);
             db.SaveChanges();
         }
+
+        public void addTagsToQuestion(Question question, int[] tags)
+        {
+            foreach(var tagId in tags)
+            {
+                Tag tag = db.Tags.FirstOrDefault(t => t.Id == tagId);
+                if(tag != null)
+                {
+                    question.Tags.Add(tag);
+                }
+            }
+            db.Entry(question).State = System.Data.Entity.EntityState.Modified;
+            db.SaveChanges();
+        }
+
+        public void updateUserReputation(string userId, int repToAdd)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+            if(user != null)
+            {
+                user.Reputation += repToAdd;
+            }
+            db.Entry(user).State = System.Data.Entity.EntityState.Modified;
+            db.SaveChanges();
+        }
     }
     class UserDataAccess : IDataAccess
     {
-        ApplicationDbContext db = new ApplicationDbContext();
+        ApplicationDbContext db;
+        public UserDataAccess(ApplicationDbContext db)
+        {
+            this.db = db;
+        }
 
         public List<Question> getQuestionList(string uid)
         {
@@ -304,6 +347,30 @@ namespace QaProject.Models
         public void saveDownVote(DownVote downVote)
         {
             db.DownVotes.Add(downVote);
+            db.SaveChanges();
+        }
+        public void addTagsToQuestion(Question question, int[] tags)
+        {
+            foreach (var tagId in tags)
+            {
+                Tag tag = db.Tags.FirstOrDefault(t => t.Id == tagId);
+                if (tag != null)
+                {
+                    question.Tags.Add(tag);
+                }
+            }
+            db.Entry(question).State = System.Data.Entity.EntityState.Modified;
+            db.SaveChanges();
+        }
+
+        public void updateUserReputation(string userId, int repToAdd)
+        {
+            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+            if (user != null)
+            {
+                user.Reputation += repToAdd;
+            }
+            db.Entry(user).State = System.Data.Entity.EntityState.Modified;
             db.SaveChanges();
         }
     }
