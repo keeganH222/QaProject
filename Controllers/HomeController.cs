@@ -162,6 +162,17 @@ namespace QaProject.Controllers
         public ActionResult Question(int id)
         {
             var question = db.Questions.FirstOrDefault(q => q.Id == id);
+            ViewBag.VoteCount = question.UpVotes.Count() - question.DownVotes.Count();
+            if(User.Identity.IsAuthenticated)
+            {
+                var userId = User.Identity.GetUserId();
+                var upVote = question.UpVotes.FirstOrDefault(v => v.userId == userId);
+                var downVote = question.DownVotes.FirstOrDefault(v => v.userId == userId);
+                if(upVote == null && downVote == null)
+                {
+                    ViewBag.userId = userId;
+                }                
+            }
             return View(question);
         }
         [HttpPost]
@@ -189,7 +200,7 @@ namespace QaProject.Controllers
             }
             return View("MainPage", tag.Questions);
         }
-        public async Task<JsonResult> UpVoteItem(string itemType, int itemId, string userId)
+        public async Task<JsonResult> UpVoteItem(string itemType, string itemId, string userId)
         {
             await Task.Run(() =>
             {
@@ -197,28 +208,28 @@ namespace QaProject.Controllers
                 string originalQuestionUserId = "";
                 if (itemType == "question")
                 {
-                    var question = qaLogic.HandleGetQuestion(itemId);
+                    var question = qaLogic.HandleGetQuestion(Convert.ToInt32(itemId));
                     if (question != null)
                     {
-                        upVote = new UpVote { questionId = itemId, userId = userId };
+                        upVote = new UpVote { questionId = Convert.ToInt32(itemId), userId = userId };
                         originalQuestionUserId = question.OwnerId;
                     }
                 }
                 else
                 {
-                    var answer = qaLogic.HandleGetAnswer(itemId);
+                    var answer = qaLogic.HandleGetAnswer(Convert.ToInt32(itemId));
                     if (answer != null)
                     {
-                        upVote = new UpVote { answerId = itemId, userId = userId };
+                        upVote = new UpVote { answerId = Convert.ToInt32(itemId), userId = userId };
                         originalQuestionUserId = answer.OwnerId;
                     }
                 }
                 qaLogic.HandleSaveUpVote(upVote);
                 qaLogic.HandleUpdateReputation(originalQuestionUserId, 5);
             });
-            return Json(JsonRequestBehavior.AllowGet);
+            return Json("UpVote",JsonRequestBehavior.AllowGet);
         }
-        public async Task<JsonResult> DownVoteItem(string itemType, int itemId, string userId)
+        public async Task<JsonResult> DownVoteItem(string itemType, string itemId, string userId)
         {
             await Task.Run(() =>
             {
@@ -226,27 +237,27 @@ namespace QaProject.Controllers
                 string originalQuestionUserId = "";
                 if (itemType == "question")
                 {
-                    var question = qaLogic.HandleGetQuestion(itemId);
+                    var question = qaLogic.HandleGetQuestion(Convert.ToInt32(itemId));
                     
                     if (question != null)
                     {
-                        upVote = new UpVote { questionId = itemId, userId = userId };
+                        upVote = new UpVote { questionId = Convert.ToInt32(itemId), userId = userId };
                         originalQuestionUserId = question.OwnerId;
                     }
                 }
                 else
                 {
-                    var answer = qaLogic.HandleGetAnswer(itemId);
+                    var answer = qaLogic.HandleGetAnswer(Convert.ToInt32(itemId));
                     if (answer != null)
                     {
-                        upVote = new UpVote { answerId = itemId, userId = userId };
+                        upVote = new UpVote { answerId = Convert.ToInt32(itemId), userId = userId };
                         originalQuestionUserId = answer.OwnerId;
                     }
                 }
                 qaLogic.HandleSaveUpVote(upVote);
                 qaLogic.HandleUpdateReputation(originalQuestionUserId, -5);
             });
-            return Json(JsonRequestBehavior.AllowGet);
+            return Json("DownVote",JsonRequestBehavior.AllowGet);
         }
     }
 }

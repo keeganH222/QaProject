@@ -6,7 +6,17 @@
 <main class="Question_Details">
     <h2 class="Question_title">@Model.Title</h2>
     <section class="Question_Content">
-        <div class="Scroll_Controller">@Model.Description</div>
+        <div class="Scroll_Controller">
+            <div class="votes_container">
+                @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.userId) &&Model.OwnerId != ViewBag.userId)
+                {
+                    <button class="votes" id="upVote" data-url="@Url.Action("UpVoteItem")" data-userid="@ViewBag.userId" data-type="question" data-itemid="@Model.Id">UpVote</button>
+                    <button class="votes" id="downVote" data-url="@Url.Action("DownVoteItem")" data-userid="@ViewBag.userId" data-type="question" data-itemid="@Model.Id">DownVote</button>
+                }
+                <div class="Vote_Count_Container">Votes:<p class="vote_Count">@ViewBag.VoteCount</p></div>
+            </div>
+            <p>@Model.Description</p>
+        </div>
         <div class="tagContainer">
             @foreach (var tag in Model.Tags)
             {
@@ -15,7 +25,7 @@
                 </span>
             }
         </div>
-        
+
         <div class="Question_Comments">
             @if (Model.Comments.Count > 0)
             {
@@ -50,3 +60,49 @@
     </section>
 </main>
 
+<script>
+    jQuery(document).ready(function () {
+        $("#upVote").click((e) => {
+            let url = $("#upVote").data("url");
+            let itemid = $("#upVote").data("itemid");
+            let userid = $("#upVote").data("userid");
+            let type = $("#upVote").data("type");
+            let jsonObj = { itemType: type, itemId: itemid, userId: userid, };
+            $.ajax({
+                type: "POST",
+                url: url,
+                contentType: 'application/json',
+                data: JSON.stringify(jsonObj),
+                traditional: true
+            }).done((resultType) => {                
+                changeVoteCount(resultType);
+            });
+        });
+        $("#downVote").click((e) => {
+            let url = $("#downVote").data("url");
+            let itemid = $("#downVote").data("itemid");
+            let userid = $("#downVote").data("userid");
+            let type = $("#downVote").data("type");
+            let jsonObj = { itemType: type, itemId: id, userId: type, };
+            $.ajax({
+                type: "POST",
+                url: url,
+                contentType: 'application/json',
+                data: JSON.stringify(jsonObj),
+                traditional: true
+            }).done((resultType) => {
+                changeVoteCount(resultType);
+            });
+        });
+        function changeVoteCount(voteType) {
+            let voteCnter = $(".vote_Count").text();
+            if (voteType === "UpVote") {
+                voteCnter += 1;
+            }
+            else {
+                voteCnter -= 1;
+            }
+            $(".vote_Count").text(voteCnter);
+        }
+    });
+</script>
