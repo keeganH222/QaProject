@@ -64,62 +64,74 @@ namespace QaProject.Controllers
             ViewBag.Description = "";
             return View(question);
         }
-        [HttpPost]
-        public ActionResult AddComment(int id, string type, [Bind (Include = "Content")]Comment comment)
+        public ActionResult AddComment(int itemId, string type)
         {
+            AddingCommentViewModel viewModel = new AddingCommentViewModel { itemId = itemId, itemType = type };
+            return View(viewModel);
+        }
+        [HttpPost]
+        public async Task<ActionResult> AddComment(int id, string type, string content)
+        {
+            Comment comment = new Comment { Content = content};
             comment.OwnerId = User.Identity.GetUserId();
-            if (type == "answer")
+            await Task.Run(() =>
             {
-                var answer = db.Answers.FirstOrDefault(a => a.Id == id);
-                if(answer != null)
+                if (type == "answer")
                 {
-                    comment.PostedOn = DateTime.Now;
-                    comment.AnswerId = id;
-                    db.Comments.Add(comment);
-                    db.SaveChanges();
+                    var answer = db.Answers.FirstOrDefault(a => a.Id == id);
+                    if (answer != null)
+                    {
+                        comment.PostedOn = DateTime.Now;
+                        comment.AnswerId = id;
+                        db.Comments.Add(comment);
+                        db.SaveChanges();
+                    }
                 }
-            }
-            else if(type == "question")
-            {
-                var question = db.Questions.FirstOrDefault(q => q.Id == id);
-                if(question != null)
+                else if (type == "question")
                 {
-                    comment.PostedOn = DateTime.Now;
-                    comment.QuestionId = id;
-                    db.Comments.Add(comment);
-                    db.SaveChanges();
+                    var question = db.Questions.FirstOrDefault(q => q.Id == id);
+                    if (question != null)
+                    {
+                        comment.PostedOn = DateTime.Now;
+                        comment.QuestionId = id;
+                        db.Comments.Add(comment);
+                        db.SaveChanges();
+                    }
                 }
-            }
-            return View();
+            }); 
+            return View("Comment", comment);
         }
-        public ActionResult postAnswer()
+        public ActionResult AddAnswer(int itemId)
         {
+            ViewBag.itemId = itemId;
             return View();
         }
         [HttpPost]
-        public ActionResult postAnswer(int id, [Bind (Include = "Content")] Answer answer)
+        [ActionName("addAnswer")]
+        public async Task<ActionResult> postAnswer(int itemId,string content)
         {
-            if(ModelState.IsValid)
+            Answer answer = new Answer { QuestionId = itemId, Content = content };
+            await Task.Run(() =>
             {
-                var question = db.Questions.FirstOrDefault(q => q.Id == id);
-                answer.OwnerId = User.Identity.GetUserId();
-                if(question != null)
+                if (ModelState.IsValid)
                 {
-                    answer.QuestionId = id;
+                    
+                    answer.OwnerId = User.Identity.GetUserId();
                     answer.PostedOn = DateTime.Now;
                     qaLogic.HandleSaveAnswerLogic(answer);
                 }
-            }
-            return View();
+            });
+
+            return View("Answer", answer);
         }
         //getting list of tag for a user to select
         public ActionResult addTag()
         {
             var tagList = db.Tags.ToList();
             List<TagViewModel> tags = new List<TagViewModel>();
-            foreach(Tag tag in tagList)
+            foreach (Tag tag in tagList)
             {
-                if(questionHelper.TagIds != null)
+                if (questionHelper.TagIds != null)
                 {
                     if (questionHelper.TagIds.Contains(tag.Id))
                     {
@@ -152,26 +164,26 @@ namespace QaProject.Controllers
         [HttpPost]
         public async Task<JsonResult> SaveTag(IEnumerable<int> arrayOfIds)
         {
-            if(arrayOfIds != null)
+            if (arrayOfIds != null)
             {
                 int[] tagIds = arrayOfIds.ToArray();
                 await Task.Run(() => questionHelper.SetTagIdArray(tagIds));
             }
-            return Json( JsonRequestBehavior.AllowGet);
+            return Json(JsonRequestBehavior.AllowGet);
         }
         public ActionResult Question(int id)
         {
             var question = db.Questions.FirstOrDefault(q => q.Id == id);
             ViewBag.VoteCount = question.UpVotes.Count() - question.DownVotes.Count();
-            if(User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
                 var userId = User.Identity.GetUserId();
                 var upVote = question.UpVotes.FirstOrDefault(v => v.userId == userId);
                 var downVote = question.DownVotes.FirstOrDefault(v => v.userId == userId);
-                if(upVote == null && downVote == null)
+                if (upVote == null && downVote == null)
                 {
                     ViewBag.userId = userId;
-                }                
+                }
             }
             return View(question);
         }
@@ -194,7 +206,7 @@ namespace QaProject.Controllers
         public ActionResult ListOfTagsQuestions(string tagName)
         {
             var tag = qaLogic.HandleGetTag(tagName);
-            if(tag == null)
+            if (tag == null)
             {
                 return HttpNotFound();
             }
@@ -227,7 +239,7 @@ namespace QaProject.Controllers
                 qaLogic.HandleSaveUpVote(upVote);
                 qaLogic.HandleUpdateReputation(originalQuestionUserId, 5);
             });
-            return Json("UpVote",JsonRequestBehavior.AllowGet);
+            return Json("UpVote", JsonRequestBehavior.AllowGet);
         }
         public async Task<JsonResult> DownVoteItem(string itemType, string itemId, string userId)
         {
@@ -238,7 +250,7 @@ namespace QaProject.Controllers
                 if (itemType == "question")
                 {
                     var question = qaLogic.HandleGetQuestion(Convert.ToInt32(itemId));
-                    
+
                     if (question != null)
                     {
                         upVote = new UpVote { questionId = Convert.ToInt32(itemId), userId = userId };
@@ -257,7 +269,7 @@ namespace QaProject.Controllers
                 qaLogic.HandleSaveUpVote(upVote);
                 qaLogic.HandleUpdateReputation(originalQuestionUserId, -5);
             });
-            return Json("DownVote",JsonRequestBehavior.AllowGet);
+            return Json("DownVote", JsonRequestBehavior.AllowGet);
         }
     }
 }

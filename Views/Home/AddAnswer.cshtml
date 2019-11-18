@@ -1,10 +1,9 @@
-﻿@model QaProject.Models.Answer
+﻿
 @{
     Layout = null;
 }
 
-
 <div>
-    <textarea>@Html.EditorFor(model => model.Content)</textarea>
-    <input type="submit" value="Add Answer" />
+    <textarea class="TextArea" id="answer" data-itemId="@ViewBag.itemId" data-url="@Url.Action("AddAnswer")"></textarea>
+    <button id="answerbtn">Submit Answer</button>
 </div>

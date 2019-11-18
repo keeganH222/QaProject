@@ -1,10 +1,14 @@
-﻿@model QaProject.Models.Comment
+﻿@model QaProject.Models.AddingCommentViewModel
 @{ 
     Layout = null;
 }
 
 
 <div>
-    <textarea>@Html.EditorFor(model => model.Content)</textarea>
-    <input type="submit" value="Add Comment" />
+    <textarea class="TextArea" id="Comment" data-itemid="@Model.itemId" data-itemtype="@Model.itemType" data-url="@Url.Action("AddComment")"></textarea>
+    <button id="commentbtn">Add Comment</button>
 </div>
+
+<script>
+     
+</script>

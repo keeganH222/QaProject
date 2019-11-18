@@ -9,7 +9,6 @@ namespace QaProject.Models
     {
         public int Id { get; set; }
         public string Content { get; set; }
-        public int Votes { get; set; }
         public DateTime PostedOn { get; set; }
         public string OwnerId { get; set; }
         public virtual ApplicationUser Owner { get; set; }

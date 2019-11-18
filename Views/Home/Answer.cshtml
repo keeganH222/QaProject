@@ -5,10 +5,36 @@
 
 
 <div class="Answer">
-    <div class="Answer Vote">@Model.Votes</div>
-    <div class="Answer Content">@Model.Content</div>
-    <div class="Answer AuthorCtn">
-        <div class="Answer_Author">@Model.Owner.UserName</div>
-        <div class="Answer_Date">@Model.PostedOn</div>
+    <div class="Answer_Container">
+        <div class="Answer_Vote">
+            <div>
+                @if (string.IsNullOrEmpty(ViewBag.userId) && ViewBag.userId != Model.OwnerId)
+                {
+                    <button class="votes" id="upVote" data-url="@Url.Action("UpVoteItem")" data-userid="@ViewBag.userId" data-type="question" data-itemid="@Model.Id">UpVote</button>
+                    <button class="votes" id="downVote" data-url="@Url.Action("DownVoteItem")" data-userid="@ViewBag.userId" data-type="question" data-itemid="@Model.Id">DownVote</button>
+                }
+            </div>
+            <p>@(Model.DownVotes.Count() - Model.UpVotes.Count())</p>
+        </div>
+        <div class="Answer_Content">@Model.Content</div>
+        <div class="Answer_AuthorCtn">
+            <div class="Answer_Author">@Model.Owner.UserName</div>
+            <div class="Answer_Date">@Model.PostedOn</div>
+        </div>
+    </div>
+    <div class="Answer_Comments_Container">
+        <div class="answer_comment">
+            @if (Model.Comments.Count() > 0)
+            {
+                foreach (var comment in Model.Comments)
+                {
+                    Html.RenderPartial("Comment", comment);
+                }
+            }
+        </div>
+        @if(User.Identity.IsAuthenticated)
+        {
+            Html.RenderAction("AddComment", new { itemId = Model.Id, itemType = "answer" });
+        }
     </div>
 </div>

@@ -183,6 +183,14 @@
     <Compile Include="Migrations\201911152040571_add-votes.Designer.cs">
       <DependentUpon>201911152040571_add-votes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201911181834101_addCommentsToAnswers.cs" />
+    <Compile Include="Migrations\201911181834101_addCommentsToAnswers.Designer.cs">
+      <DependentUpon>201911181834101_addCommentsToAnswers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911181837147_removingVotesFromComment.cs" />
+    <Compile Include="Migrations\201911181837147_removingVotesFromComment.Designer.cs">
+      <DependentUpon>201911181837147_removingVotesFromComment.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Answer.cs" />
@@ -432,6 +440,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201911152040571_add-votes.resx">
       <DependentUpon>201911152040571_add-votes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911181834101_addCommentsToAnswers.resx">
+      <DependentUpon>201911181834101_addCommentsToAnswers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911181837147_removingVotesFromComment.resx">
+      <DependentUpon>201911181837147_removingVotesFromComment.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

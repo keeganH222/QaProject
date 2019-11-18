@@ -17,4 +17,9 @@ namespace QaProject.Models
         public string tagName { get; set; }
         public bool IsChecked { get; set; }
     }
+    public class AddingCommentViewModel
+    {
+        public int itemId { get; set; }
+        public string itemType { get; set; }
+    }
 }

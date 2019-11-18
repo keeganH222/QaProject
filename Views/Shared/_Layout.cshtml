@@ -8,8 +8,13 @@
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/tclcbt9sejr6qca0bs8wqkb01wm84ic516zwsv9wu8jj6x8i/tinymce/5/tinymce.min.js"></script>
     @RenderSection("Scripts", required: false)
-
+    <script>
+        //tinymce.init({
+        //selector: ".TextArea"
+        //}); 
+    </script>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">

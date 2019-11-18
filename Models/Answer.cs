@@ -11,6 +11,7 @@ namespace QaProject.Models
         {
             this.UpVotes = new List<UpVote>();
             this.DownVotes = new List<DownVote>();
+            this.Comments = new List<Comment>();
         }
         public int Id { get; set; }
         public string Content { get; set; }
@@ -21,5 +22,6 @@ namespace QaProject.Models
         public virtual Question Question { get; set; }
         public virtual ICollection<UpVote> UpVotes { get; set; }
         public virtual ICollection<DownVote> DownVotes { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
     }
 }
