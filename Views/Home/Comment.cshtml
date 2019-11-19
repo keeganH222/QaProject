@@ -1,12 +1,12 @@
-﻿@model QaProject.Models.Comment
+﻿@model QaProject.Models.CommentViewModel
 @{
     Layout = null;
 }
 
 <div class="Comment">
-    <div class="Comment_Content">@Model.Content</div>
+    <div class="Comment_Content">@Model.comment.Content</div>
     <div class="Comment_AuthorCtn">
-        <div class="Comment_Author">@Model.Owner.UserName</div>
-        <div class="Comment_Date">Posted on:@Model.PostedOn</div>
+        <div class="Comment_Author">@Model.userName</div>
+        <div class="Comment_Date">Posted on:@Model.comment.PostedOn</div>
     </div>
 </div>

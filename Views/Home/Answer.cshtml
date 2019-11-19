@@ -1,4 +1,4 @@
-﻿@model QaProject.Models.Answer
+﻿@model QaProject.Models.AnswerViewModel
 @{
     Layout = null;
 }
@@ -8,33 +8,40 @@
     <div class="Answer_Container">
         <div class="Answer_Vote">
             <div>
-                @if (string.IsNullOrEmpty(ViewBag.userId) && ViewBag.userId != Model.OwnerId)
+                @if (!string.IsNullOrEmpty(ViewBag.userId) && ViewBag.userId != Model.answer.OwnerId)
                 {
-                    <button class="votes" id="upVote" data-url="@Url.Action("UpVoteItem")" data-userid="@ViewBag.userId" data-type="question" data-itemid="@Model.Id">UpVote</button>
-                    <button class="votes" id="downVote" data-url="@Url.Action("DownVoteItem")" data-userid="@ViewBag.userId" data-type="question" data-itemid="@Model.Id">DownVote</button>
+                    Html.RenderPartial("VoteButton", new QaProject.Models.ButtonViewModel { Id = Model.answer.Id, UserId = ViewBag.userId, Type = "answer" });
                 }
             </div>
-            <p>@(Model.DownVotes.Count() - Model.UpVotes.Count())</p>
+            <p id="@("vote_count_answer_" + Model.answer.Id)">@(Model.answer.DownVotes.Count() - Model.answer.UpVotes.Count())</p>
         </div>
-        <div class="Answer_Content">@Model.Content</div>
+        <div class="Answer_Content">@Model.answer.Content</div>
         <div class="Answer_AuthorCtn">
-            <div class="Answer_Author">@Model.Owner.UserName</div>
-            <div class="Answer_Date">@Model.PostedOn</div>
+            <div class="Answer_Author">@Model.userName</div>
+            <div class="Answer_Date">@Model.answer.PostedOn</div>
         </div>
     </div>
     <div class="Answer_Comments_Container">
-        <div class="answer_comment">
-            @if (Model.Comments.Count() > 0)
+        <div class="answer_comment" id="@("answer_comment_"+Model.answer.Id)">
+            @if (Model.answer.Comments.Count() > 0)
             {
-                foreach (var comment in Model.Comments)
+                foreach (var comment in Model.answer.Comments)
                 {
-                    Html.RenderPartial("Comment", comment);
+                    Html.RenderPartial("Comment", new QaProject.Models.CommentViewModel { comment = comment, userName = comment.Owner.UserName });
                 }
             }
         </div>
         @if(User.Identity.IsAuthenticated)
         {
-            Html.RenderAction("AddComment", new { itemId = Model.Id, itemType = "answer" });
+            <div id="@("addCommentAnswer" + Model.answer.Id)">
+                <button data-url="@Url.Action("AddComment", "Home", new { itemId = Model.answer.Id, type = "answer" })" data-answerid="@Model.answer.Id" class="addComment">Add Comment</button>
+            </div>
         }
     </div>
 </div>
+
+<script>
+    jQuery(document).ready(function () {
+        $(".addComment").click(getTextAreaForComment);
+    });
+</script>

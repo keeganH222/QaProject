@@ -13,10 +13,17 @@ namespace QaProject.Models
         {
             this.tagList = new List<Tag>();
             this.tagList = db.Tags.ToList();
+            this.incrementCommentCount = 0;
         }
         
         public List<Tag> tagList { get; set; }
         public int[] TagIds { get; set; }
+        public int commentCount { get; set; }
+        public int incrementCommentCount { get; set; }
+        public void resetCommentCount()
+        {
+            this.commentCount = 0;
+        }
         public void SetTagIdArray(int[] tagId)
         {
             this.TagIds = tagId;

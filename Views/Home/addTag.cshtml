@@ -83,15 +83,4 @@
         $.noConflict();
         $('#userTable').dataTable();
     });
-    function AddTag(tagId, tagName) {
-        let tr = $("<tr></tr>");
-        let Nametd = $("<td></td>");
-        let Checktd = $("<td></td>");
-        let span = $("<span></span>").text(tagName);
-        let checkBoxInput = $("<input class='tags' type='checkbox' checked/>").attr("Data-id", tagId).attr("Data-name", tagName);
-        Nametd.append(span);
-        Checktd.append(checkBoxInput);
-        tr.append(Nametd).append(Checktd);
-        $("tbody").prepend(tr);
-    };
 </script>

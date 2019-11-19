@@ -28,6 +28,7 @@ namespace QaProject.Models
         Question getQuestion(int id);
         Answer getAnswer(int id);
         void updateUserReputation(string userId, int repToAdd);
+        Comment getComment(int id);
     }
     class QALogic
     {
@@ -104,6 +105,10 @@ namespace QaProject.Models
         public void HandleUpdateReputation(string userId, int repToAdd)
         {
             dta.updateUserReputation(userId, repToAdd);
+        }
+        public Comment HandleGetComment(int id)
+        {
+            return dta.getComment(id);
         }
     }
 
@@ -195,6 +200,11 @@ namespace QaProject.Models
         {
             var answer = db.Answers.FirstOrDefault(a => a.Id == id);
             return answer;
+        }
+        public Comment getComment(int id)
+        {
+            var comment = db.Comments.FirstOrDefault(a => a.Id == id);
+            return comment;
         }
         public void saveUpVote(UpVote upVote)
         {
@@ -338,6 +348,11 @@ namespace QaProject.Models
         {
             var answer = db.Answers.FirstOrDefault(a => a.Id == id);
             return answer;
+        }
+        public Comment getComment(int id)
+        {
+            var comment = db.Comments.FirstOrDefault(a => a.Id == id);
+            return comment;
         }
         public void saveUpVote(UpVote upVote)
         {

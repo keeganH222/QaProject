@@ -3,99 +3,66 @@
     ViewBag.Title = "Question";
 }
 
-    <main class="Question_Details">
-        <h2 class="Question_title">@Model.Title</h2>
-        <section class="Question_Content">
-            <div class="Scroll_Controller">
-                <div class="votes_container">
-                    @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.userId) && Model.OwnerId != ViewBag.userId)
-                    {
-                        <button class="votes" id="upVote" data-url="@Url.Action("UpVoteItem")" data-userid="@ViewBag.userId" data-type="question" data-itemid="@Model.Id">UpVote</button>
-                        <button class="votes" id="downVote" data-url="@Url.Action("DownVoteItem")" data-userid="@ViewBag.userId" data-type="question" data-itemid="@Model.Id">DownVote</button>
-                    }
-                    <div class="Vote_Count_Container">Votes:<p class="vote_Count">@ViewBag.VoteCount</p></div>
-                </div>
-                <p>@Model.Description</p>
-            </div>
-            <div class="tagContainer">
-                @foreach (var tag in Model.Tags)
+<main class="Question_Details">
+    <h2 class="Question_title">@Model.Title</h2>
+    <section class="Question_Content">
+        <div class="Scroll_Controller">
+            <div class="votes_container">
+                @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.userId) && Model.OwnerId != ViewBag.userId)
                 {
-                    <span class="shownTags">
-                        @tag.Name
-                    </span>
+                    Html.RenderPartial("VoteButton", new QaProject.Models.ButtonViewModel { Id = Model.Id, UserId = ViewBag.userId, Type = "question" });
+                }
+                <div class="Vote_Count_Container">Votes:<p class="vote_Count" id="@("vote_count_question_" + Model.Id)">@ViewBag.VoteCount</p></div>
+            </div>
+            <p>@Model.Description</p>
+        </div>
+        <div class="tagContainer">
+            @foreach (var tag in Model.Tags)
+            {
+                <span class="shownTags">
+                    @tag.Name
+                </span>
+            }
+        </div>
+        <div class="Answer_Container">
+            <div class="Answers">
+                @if (Model.Answers.Count > 0)
+                {
+                    foreach (var answer in Model.Answers)
+                    {
+                        Html.RenderPartial("Answer", new QaProject.Models.AnswerViewModel { answer = answer, userName = answer.Owner.UserName });
+                    }
                 }
             </div>
-            <div class="Answer_Container">
-                <div class="Answers">
-                    @if (Model.Answers.Count > 0)
-                    {
-                        foreach (var answer in Model.Answers)
-                        {
-                            Html.RenderPartial("Answer", answer);
-                        }
-                    }
-                </div>
-                @if (User.Identity.IsAuthenticated)
-                {
-                        Html.RenderAction("AddAnswer", new { itemId = Model.Id });
-                }
-            </div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                Html.RenderAction("AddAnswer", new { itemId = Model.Id, answerCount = Model.Answers.Count() });
+            }
+        </div>
 
-        </section>
-        <section class="Comments_Container">
-            <div class="Question_Comments">
-                <div class="question_comment">
-                    @if (Model.Comments.Count > 0)
-                    {
-                        foreach (var comment in Model.Comments)
-                        {
-                            Html.RenderPartial("Comment", comment);
-                        }
-                    }
-                </div>
-                @if (User.Identity.IsAuthenticated)
+    </section>
+    <section class="Comments_Container">
+        <div class="Question_Comments">
+            <div class="question_comment">
+                @if (Model.Comments.Count > 0)
                 {
-                        Html.RenderAction("AddComment", new { itemId = Model.Id, type = "question" });
+                    foreach (var comment in Model.Comments)
+                    {
+                        Html.RenderPartial("Comment", new QaProject.Models.CommentViewModel{ comment = comment, userName = comment.Owner.UserName});
+                    }
                 }
             </div>
-        </section>
-        
-    </main>
+            @if (User.Identity.IsAuthenticated)
+            {
+                Html.RenderAction("AddComment", new { itemId = Model.Id, type = "question", commentCount = Model.Comments.Count() });
+            }
+        </div>
+    </section>
+
+</main>
 
 <script>
     jQuery(document).ready(function () {
-        $("#upVote").click((e) => {
-            let url = $("#upVote").data("url");
-            let itemid = $("#upVote").data("itemid");
-            let userid = $("#upVote").data("userid");
-            let type = $("#upVote").data("type");
-            let jsonObj = { itemType: type, itemId: itemid, userId: userid, };
-            $.ajax({
-                type: "POST",
-                url: url,
-                contentType: 'application/json',
-                data: JSON.stringify(jsonObj),
-                traditional: true
-            }).done((resultType) => {                
-                changeVoteCount(resultType);
-            });
-        });
-        $("#downVote").click((e) => {
-            let url = $("#downVote").data("url");
-            let itemid = $("#downVote").data("itemid");
-            let userid = $("#downVote").data("userid");
-            let type = $("#downVote").data("type");
-            let jsonObj = { itemType: type, itemId: itemid, userId: userid, };
-            $.ajax({
-                type: "POST",
-                url: url,
-                contentType: 'application/json',
-                data: JSON.stringify(jsonObj),
-                traditional: true
-            }).done((resultType) => {
-                changeVoteCount(resultType);
-            });
-        });
         $("#answerbtn").click(() => {
             let content = $("#answer").val();
             let id = $("#answer").data("itemid");
@@ -112,36 +79,6 @@
                 $(".Answers").prepend(htmlResult);
             });
         });
-        $("#commentbtn").click(() => {
-            let content = $("#commentbtn").val();
-            let id = $("#commentbtn").data("itemid");
-            let url = $("#commentbtn").data("url");
-            let type = $("#commentbtn").data("itemtype")
-            let jsonObj = JSON.stringify({ itemId: id, content: content, itemType:type });
-            $.ajax({
-                type: "POST",
-                url: url,
-                contentType: "application/json",
-                data: jsonObj,
-                traditional: true
-            }).done((htmlResult) => {
-                alert(htmlResult);
-                if (type === "question") {
-                    $(".question_comment").prepend(htmlResult);
-                } else {
-                    $(".answer_comment").prepend(htmlResult);
-                }
-            });
-        });
-        function changeVoteCount(voteType) {
-            let voteCnter = $(".vote_Count").text();
-            if (voteType === "UpVote") {
-                voteCnter += 1;
-            }
-            else {
-                voteCnter -= 1;
-            }
-            $(".vote_Count").text(voteCnter);
-        }
+        
     });
 </script>

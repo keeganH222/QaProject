@@ -1,0 +1,12 @@
+﻿@model QaProject.Models.ButtonViewModel
+@{
+    Layout = null;
+}
+<button class="votes" id="@("UpVotequestion" + Model.Id)" data-url="@Url.Action("UpVoteItem")" data-userid="@Model.UserId" data-type="@Model.Type" data-itemid="@Model.Id">UpVote</button>
+<button class="votes" id="@("DownVotequestion" + Model.Id)" data-url="@Url.Action("DownVoteItem")" data-userid="@Model.UserId" data-type="@Model.Type" data-itemid="@Model.Id">DownVote</button>
+
+<script>
+    jQuery(document).ready(function () {
+        $(".votes").click(saveVote);
+    });
+</script>

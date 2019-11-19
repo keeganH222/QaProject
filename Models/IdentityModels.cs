@@ -20,11 +20,11 @@ namespace QaProject.Models
             this.Reputation = 50;
         }
         public int Reputation { get; set; }
-        public ICollection<Question> Questions { get; set; }
-        public ICollection<Answer> Answers { get; set; }
-        public ICollection<Comment> Comments { get; set; }
-        public ICollection<UpVote> UpVotes { get; set; }
-        public ICollection<DownVote> DownVotes { get; set; }
+        public virtual ICollection<Question> Questions { get; set; }
+        public virtual ICollection<Answer> Answers { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<UpVote> UpVotes { get; set; }
+        public virtual ICollection<DownVote> DownVotes { get; set; }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

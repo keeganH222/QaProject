@@ -1,9 +1,9 @@
-﻿
+﻿@model QaProject.Models.AddingAnswerViewModel
 @{
     Layout = null;
 }
 
-<div>
-    <textarea class="TextArea" id="answer" data-itemId="@ViewBag.itemId" data-url="@Url.Action("AddAnswer")"></textarea>
+<div class="addAnswer">
+    <textarea class="TextArea" id="answer" data-itemId="@Model.itemId" data-url="@Url.Action("AddAnswer")"></textarea>
     <button id="answerbtn">Submit Answer</button>
 </div>

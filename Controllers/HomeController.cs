@@ -64,47 +64,49 @@ namespace QaProject.Controllers
             ViewBag.Description = "";
             return View(question);
         }
-        public ActionResult AddComment(int itemId, string type)
+        public ActionResult AddComment(int? itemId, string type)
         {
-            AddingCommentViewModel viewModel = new AddingCommentViewModel { itemId = itemId, itemType = type };
+            AddingCommentViewModel viewModel = new AddingCommentViewModel { itemId = (int)itemId, itemType = type, commentCount = questionHelper.commentCount };        
+            questionHelper.commentCount++;
             return View(viewModel);
         }
         [HttpPost]
-        public async Task<ActionResult> AddComment(int id, string type, string content)
+        public async Task<ActionResult> AddComment(int itemid, string type, string content)
         {
             Comment comment = new Comment { Content = content};
             comment.OwnerId = User.Identity.GetUserId();
+            int commentToDisplayId = -12;
             await Task.Run(() =>
             {
                 if (type == "answer")
                 {
-                    var answer = db.Answers.FirstOrDefault(a => a.Id == id);
+                    var answer = qaLogic.HandleGetAnswer(itemid);
                     if (answer != null)
                     {
-                        comment.PostedOn = DateTime.Now;
-                        comment.AnswerId = id;
-                        db.Comments.Add(comment);
-                        db.SaveChanges();
+                        comment.AnswerId = itemid;
                     }
                 }
                 else if (type == "question")
                 {
-                    var question = db.Questions.FirstOrDefault(q => q.Id == id);
+                    var question = qaLogic.HandleGetQuestion(itemid);
                     if (question != null)
                     {
                         comment.PostedOn = DateTime.Now;
-                        comment.QuestionId = id;
-                        db.Comments.Add(comment);
-                        db.SaveChanges();
+                        comment.QuestionId = itemid;
                     }
                 }
-            }); 
-            return View("Comment", comment);
+                comment.PostedOn = DateTime.Now;
+                qaLogic.HandleSaveCommentLogic(comment);
+                commentToDisplayId = comment.Id;
+            });
+            Task.WaitAll();
+            CommentViewModel viewModel = new CommentViewModel { comment = comment, userName = User.Identity.Name };
+            return View("Comment", viewModel);
         }
-        public ActionResult AddAnswer(int itemId)
+        public ActionResult AddAnswer(int itemId, int answerCount)
         {
-            ViewBag.itemId = itemId;
-            return View();
+            AddingAnswerViewModel viewModel = new AddingAnswerViewModel { itemId = itemId, answerCount = answerCount };
+            return View(viewModel);
         }
         [HttpPost]
         [ActionName("addAnswer")]
@@ -121,8 +123,8 @@ namespace QaProject.Controllers
                     qaLogic.HandleSaveAnswerLogic(answer);
                 }
             });
-
-            return View("Answer", answer);
+            AnswerViewModel viewModel = new AnswerViewModel { answer = answer, userName = User.Identity.Name };
+            return View("Answer", viewModel);
         }
         //getting list of tag for a user to select
         public ActionResult addTag()
@@ -185,6 +187,7 @@ namespace QaProject.Controllers
                     ViewBag.userId = userId;
                 }
             }
+            questionHelper.resetCommentCount();
             return View(question);
         }
         [HttpPost]
@@ -195,8 +198,29 @@ namespace QaProject.Controllers
         }
         public ActionResult MainPage()
         {
-            var questionList = qaLogic.HandleQuestionListLogic("retieve list");
+            var questionList = qaLogic.HandleQuestionListLogic("retrieve list");
             return View(questionList.OrderByDescending(q => q.PostedOn));
+        }
+        public ActionResult FilterNewestQuestion()
+        {
+            var questionList = qaLogic.HandleQuestionListLogic("retrieve list");
+            var questionsToDisplay = questionList.OrderByDescending(q => q.PostedOn.Year)
+                .ThenByDescending(q => q.PostedOn.Month)
+                .ThenByDescending(q => q.PostedOn.Day).ToList();
+            return View("MainPage",questionsToDisplay);
+        }
+        public ActionResult FilterAnsweredQuestion()
+        {
+            var questionList = qaLogic.HandleQuestionListLogic("retrieve list");
+            var questionToDisplay = questionList.OrderByDescending(q => q.Answers.Count());
+            return View("MainPage", questionToDisplay);
+        }
+        public ActionResult FilterTopQuestion()
+        {
+            var questionList = qaLogic.HandleQuestionListLogic("retrieve list");
+            var questionToDisplay = questionList.Where(q => q.PostedOn.Day == DateTime.Now.Day)
+                .OrderByDescending(q => q.Answers.Count());
+            return View("MainPage", questionToDisplay);
         }
         public ActionResult TagList()
         {
@@ -245,7 +269,7 @@ namespace QaProject.Controllers
         {
             await Task.Run(() =>
             {
-                UpVote upVote = null;
+                DownVote downVote = null;
                 string originalQuestionUserId = "";
                 if (itemType == "question")
                 {
@@ -253,7 +277,7 @@ namespace QaProject.Controllers
 
                     if (question != null)
                     {
-                        upVote = new UpVote { questionId = Convert.ToInt32(itemId), userId = userId };
+                        downVote = new DownVote { questionId = Convert.ToInt32(itemId), userId = userId };
                         originalQuestionUserId = question.OwnerId;
                     }
                 }
@@ -262,11 +286,11 @@ namespace QaProject.Controllers
                     var answer = qaLogic.HandleGetAnswer(Convert.ToInt32(itemId));
                     if (answer != null)
                     {
-                        upVote = new UpVote { answerId = Convert.ToInt32(itemId), userId = userId };
+                        downVote = new DownVote { answerId = Convert.ToInt32(itemId), userId = userId };
                         originalQuestionUserId = answer.OwnerId;
                     }
                 }
-                qaLogic.HandleSaveUpVote(upVote);
+                qaLogic.HandleSaveDownVote(downVote);
                 qaLogic.HandleUpdateReputation(originalQuestionUserId, -5);
             });
             return Json("DownVote", JsonRequestBehavior.AllowGet);
