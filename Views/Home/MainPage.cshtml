@@ -1,4 +1,7 @@
-﻿@model IEnumerable<QaProject.Models.Question>
+﻿@model PagedList.IPagedList<QaProject.Models.Question>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
 
 @{
     ViewBag.Title = "MainPage";
@@ -12,59 +15,42 @@
 <h2>MainPage</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Ask a Question?", "postQuestion")
 </p>
-<table class="table" id="userTable">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Owner.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayName("Tags")
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PostedOn)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var item in Model)
+<div class="list_links">
+    @Html.ActionLink("Newest Questions", "FilterNewestQuestions")
+    @Html.ActionLink("Most Answered Questions", "FilterAnsweredQuestions")
+    @Html.ActionLink("Today's Top Questions", "FilterTopQuestions")
+</div>
+<section>
+    @if(Model.Count() > 0)
+    {
+        foreach(var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Owner.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    <div class="questionTags">
-                        @foreach(var tags in item.Tags)
-                        {
-                            <p>
-                                @Html.ActionLink(tags.Name, "ListOfTagsQuestions", new { tagName = tags.Name })
-                            </p>
-                        }
-                    </div>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PostedOn)
-                </td>
-                <td>
-                    @Html.ActionLink("Details", "Question", new { id = item.Id })
-                </td>
-            </tr>
+            <div class="Question_Container">
+                <div class="Question_Content">
+                    <h4>@item.Title</h4>
+                    <p>@item.Description</p>
+                </div>
+                <div class="Question_Author_Container">
+                    <p>@item.Owner.Reputation</p>
+                    <div class="Question_Author_placeHolder"></div>
+                    <p>@item.Owner.UserName</p>
+                </div>
+                @foreach(var tag in item.Tags)
+                {
+                    <span>
+                        @Html.ActionLink(tag.Name, "ListOfTagsQuestions", new { tagName = tag.Name });
+                    </span>
+                }
+            </div>
         }
-    </tbody>
+    }
+</section>
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
 
-</table>
-
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
 
 <script>
     jQuery(document).ready(function () {

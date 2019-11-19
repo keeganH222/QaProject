@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
+using PagedList;
 using QaProject.Models;
 using System;
 using System.Collections.Generic;
@@ -56,7 +57,6 @@ namespace QaProject.Controllers
                 //Ajax requests have saved user select tags, must retrieve them from an object helper
                 var tagsToAdd = questionHelper.getQuestionTags();
                 questionHelper.removeTagArray();
-                //db.Entry(question).State = System.Data.Entity.EntityState.Detached;
                 qaLogic.HandleSaveQuestionLogic(question);
                 qaLogic.HandleAddTagsToQuestion(question, tagsToAdd);
                 return RedirectToAction("Question", new { id = question.Id });
@@ -196,31 +196,44 @@ namespace QaProject.Controllers
             var task = await Task.Run(() => questionHelper.RemoveSpecificTag(TagName));
             return Json(JsonRequestBehavior.AllowGet);
         }
-        public ActionResult MainPage()
+        public ActionResult MainPage(int? page)
         {
-            var questionList = qaLogic.HandleQuestionListLogic("retrieve list");
-            return View(questionList.OrderByDescending(q => q.PostedOn));
+            ViewBag.url = "MainPage";
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            var questionList = qaLogic.HandleQuestionListLogic("retrieve list").OrderByDescending(q => q.PostedOn);
+            return View(questionList.ToPagedList(pageNumber, pageSize));
+            
         }
-        public ActionResult FilterNewestQuestion()
+        public ActionResult FilterNewestQuestions(int? page)
         {
+            ViewBag.url = "FilterNewestQuestions";
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
             var questionList = qaLogic.HandleQuestionListLogic("retrieve list");
             var questionsToDisplay = questionList.OrderByDescending(q => q.PostedOn.Year)
                 .ThenByDescending(q => q.PostedOn.Month)
                 .ThenByDescending(q => q.PostedOn.Day).ToList();
-            return View("MainPage",questionsToDisplay);
+            return View("MainPage",questionsToDisplay.ToPagedList(pageNumber, pageSize));
         }
-        public ActionResult FilterAnsweredQuestion()
+        public ActionResult FilterAnsweredQuestions(int? page)
         {
+            ViewBag.url = "FilterAnsweredQuestions";
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
             var questionList = qaLogic.HandleQuestionListLogic("retrieve list");
-            var questionToDisplay = questionList.OrderByDescending(q => q.Answers.Count());
-            return View("MainPage", questionToDisplay);
+            var questionToDisplay = questionList.OrderByDescending(q => q.Answers.Count()).ToList();
+            return View("MainPage", questionToDisplay.ToPagedList(pageNumber, pageSize));
         }
-        public ActionResult FilterTopQuestion()
+        public ActionResult FilterTopQuestions(int? page)
         {
+            ViewBag.url = "FilterTopQuestions";
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
             var questionList = qaLogic.HandleQuestionListLogic("retrieve list");
-            var questionToDisplay = questionList.Where(q => q.PostedOn.Day == DateTime.Now.Day)
-                .OrderByDescending(q => q.Answers.Count());
-            return View("MainPage", questionToDisplay);
+            var questionToDisplay = questionList.Where(q => q.PostedOn.Day == DateTime.Now.Day && q.PostedOn.Month == DateTime.Now.Month && q.PostedOn.Year == DateTime.Now.Year)
+                .OrderByDescending(q => q.Answers.Count()).ToList();
+            return View("MainPage", questionToDisplay.ToPagedList(pageNumber, pageSize));
         }
         public ActionResult TagList()
         {
