@@ -58,29 +58,28 @@
     </div>
 </div>
 <script>
-    jQuery('#createTagBtn').click((e) => {
-        let tagName = $('.tagName').val();
-        let url = "/Home/CreateTag";
-        let jsonObj = JSON.stringify({ tagName: tagName});
-        $.ajax({
-            type: "POST",
-            url: url,
-            contentType: "application/json",
-            data: jsonObj,
-            traditional: true
-        }).done((e) => {
-            let tagId = JSON.parse(e);
-            alert(tagId);
-            AddTag(tagId, tagName)
-        });
-    });
-    jQuery('.createTag').click(() => {
-        $('.tagForm').removeClass('hidden');
-
-        $('.createTag').addClass('hidden');
-    });
     jQuery(document).ready(function () {
-        $.noConflict();
         $('#userTable').dataTable();
+        $('.createTag').click(() => {
+            $('.tagForm').removeClass('hidden');
+
+            $('.createTag').addClass('hidden');
+        });
+        $('#createTagBtn').click((e) => {
+            let tagName = $('.tagName').val();
+            let url = "/Home/CreateTag";
+            let jsonObj = JSON.stringify({ tagName: tagName });
+            $.ajax({
+                type: "POST",
+                url: url,
+                contentType: "application/json",
+                data: jsonObj,
+                traditional: true
+            }).done((e) => {
+                let tagId = JSON.parse(e);
+                alert(tagId);
+                AddTag(tagId, tagName)
+            });
+        });
     });
 </script>

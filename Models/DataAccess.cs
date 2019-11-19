@@ -219,16 +219,19 @@ namespace QaProject.Models
 
         public void addTagsToQuestion(Question question, int[] tags)
         {
-            foreach(var tagId in tags)
+            if(tags != null)
             {
-                Tag tag = db.Tags.FirstOrDefault(t => t.Id == tagId);
-                if(tag != null)
+                foreach (var tagId in tags)
                 {
-                    question.Tags.Add(tag);
+                    Tag tag = db.Tags.FirstOrDefault(t => t.Id == tagId);
+                    if (tag != null)
+                    {
+                        question.Tags.Add(tag);
+                    }
                 }
+                db.Entry(question).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
             }
-            db.Entry(question).State = System.Data.Entity.EntityState.Modified;
-            db.SaveChanges();
         }
 
         public void updateUserReputation(string userId, int repToAdd)

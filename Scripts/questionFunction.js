@@ -115,17 +115,16 @@ function removeTag(e) {
 };
 
 function changeVoteCount(voteType, itemId, itemType) {
-    let voteElement = $("#vote_Count_" + itemType + itemId);
-    let voteCnter = voteElement.text();
-    alert(voteCnter);
+    let elementName = "#vote_count_" + itemType + "_" + itemId;
+    let voteElement = $(elementName);
+    let voteCnter = parseInt(voteElement.text());
     if (voteType === "UpVote") {
         voteCnter += 1;
     }
     else {
         voteCnter -= 1;
     }
-    alert(voteCnter);
-    voteElement.text(voteCnter);
+    voteElement.html(voteCnter);
 }
 function addComment(e) {
     let counter = $(this).data("count");
@@ -152,7 +151,6 @@ function addComment(e) {
 function getTextAreaForComment() {
     let answerId = $(this).data("answerid");
     let url = $(this).data("url");
-    let elementToAttach = "#addCommentAnswer" + answerId
     $(this).addClass("hidden");
     $.get(url).done((result) => {
         $("#addCommentAnswer" + answerId).html(result);
