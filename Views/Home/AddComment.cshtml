@@ -4,7 +4,7 @@
 }
 
 
-<div>
+<div class="@("add_comment_container_" + Model.itemId)">
     <textarea class="TextArea" id="@("Comment" + Model.commentCount)" data-itemid="@Model.itemId" data-itemtype="@Model.itemType" data-url="@Url.Action("AddComment")"></textarea>
     <button id="@("commentbtn" + Model.commentCount)" class="commentbtn" data-count="@(Model.commentCount)">Add Comment @Model.commentCount</button>
 </div>

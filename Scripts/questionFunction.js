@@ -30,13 +30,11 @@ function Save(e) {
             if (Nameindex != -1) {
 
                 if (Nameindex === NameArr.length - 1 && NameArr.length > 2) {
-                    alert("first test");
                     NameArr[Nameindex] = NameArr.shift();
                     Idarr[Nameindex] = Idarr.shift();
                 }
                 else if (NameArr.length === 2) {
                     if (Nameindex === NameArr.length - 1) {
-                        alert("second test");
                         NameArr.pop();
                         Idarr.pop();
                     }
@@ -47,7 +45,6 @@ function Save(e) {
 
                 }
                 else {
-                    alert("third test");
                     NameArr = new Array();
                     Idarr = new Array();
                 }
@@ -142,12 +139,12 @@ function addComment(e) {
         data: jsonObj,
         traditional: true
     }).done((htmlResult) => {
-        alert(htmlResult);
         if (type === "question") {
             $(".question_comment").prepend(htmlResult);
         } else {
             $("#answer_comment_" + id).prepend(htmlResult);
         }
+        $("#Comment" + counter).val("");
     });
 };
 function getTextAreaForComment() {
@@ -159,14 +156,22 @@ function getTextAreaForComment() {
     });
 };
 function AddTag(tagId, tagName) {
-    let tr = $("<tr></tr>");
-    let Nametd = $("<td></td>");
-    let Checktd = $("<td></td>");
-    let span = $("<span></span>").text(tagName);
-    let checkBoxInput = $("<input class='tags' type='checkbox' checked/>").attr("Data-id", tagId).attr("Data-name", tagName);
-    Nametd.append(span);
-    Checktd.append(checkBoxInput);
-    tr.append(Nametd).append(Checktd);
+    let existingTag = $("#tagsToAdd" + tagId);
+    let tr = undefined;
+    if (existingTag.length === 0) {
+        tr = $("<tr></tr>");
+        let Nametd = $("<td></td>");
+        let Checktd = $("<td></td>");
+        let span = $("<span></span>").text(tagName);
+        let checkBoxInput = $("<input class='tags' type='checkbox' checked/>").attr("Data-id", tagId).attr("Data-name", tagName);
+        Nametd.append(span);
+        Checktd.append(checkBoxInput);
+        tr.append(Nametd).append(Checktd);
+    } else {
+        inputtag = existingTag.children(".tagInput").children(".tags").prop("checked", true);
+        tr = existingTag;
+        $("tbody").remove(existingTag)
+    }
     $("tbody").prepend(tr);
 };
 function saveVote() {

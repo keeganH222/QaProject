@@ -33,11 +33,11 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        <tr>
+                        <tr id="@("tagsToAdd" + item.tagId)">
                             <td>
                                 @Html.DisplayFor(modelItem => item.tagName)
                             </td>
-                            <td>
+                            <td class="tagInput">
                                 @if (item.IsChecked)
                                 {
                                     <input class="tags" type="checkbox" data-Id="@item.tagId" data-Name="@item.tagName" checked />
@@ -59,7 +59,6 @@
 </div>
 <script>
     jQuery(document).ready(function () {
-        $('#userTable').dataTable();
         $('.createTag').click(() => {
             $('.tagForm').removeClass('hidden');
 
@@ -77,8 +76,8 @@
                 traditional: true
             }).done((e) => {
                 let tagId = JSON.parse(e);
-                alert(tagId);
                 AddTag(tagId, tagName)
+                $('.tagName').val("");
             });
         });
     });

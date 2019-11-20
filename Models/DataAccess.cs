@@ -151,8 +151,8 @@ namespace QaProject.Models
         {
             if (!String.IsNullOrEmpty(tag))
             {
-                var tagNames = db.Tags.Select(t => t.Name).Distinct().ToList();
-                int index = tagNames.IndexOf(tag);
+                var tagNames = db.Tags.Select(t => t.Name.ToLower()).Distinct().ToList();
+                int index = tagNames.IndexOf(tag.ToLower());
                 if(index == -1)
                 {
                     Tag tagToSave = new Tag { Name = tag };

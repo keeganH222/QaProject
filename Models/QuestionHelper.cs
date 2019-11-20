@@ -11,7 +11,6 @@ namespace QaProject.Models
         private ApplicationDbContext db = new ApplicationDbContext();
         public QuestionHelper()
         {
-            this.tagList = new List<Tag>();
             this.tagList = db.Tags.ToList();
             this.incrementCommentCount = 0;
         }

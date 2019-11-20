@@ -32,7 +32,11 @@ namespace QaProject.Migrations
             if (!context.Users.Any(u => u.UserName == "Admin@test.com"))
             {
                 ApplicationUser Admin = new ApplicationUser { UserName = "Admin@test.com", Email = "Admin@test.com" };
+                ApplicationUser test = new ApplicationUser { UserName = "test@test.com", Email = "Admin@test.com" };
+                ApplicationUser user = new ApplicationUser { UserName = "user@test.com", Email = "Admin@test.com" };
                 UserManager.Create(Admin, "EntityFr@mew0rk");
+                UserManager.Create(test, "EntityFr@mew0rk");
+                UserManager.Create(user, "EntityFr@mew0rk");
                 UserManager.AddToRole(Admin.Id, "Admin");
             }
             if(context.Tags.Count() == 0)
@@ -40,7 +44,7 @@ namespace QaProject.Migrations
                 context.Tags.AddOrUpdate(
                 new Tag { Name = "Java" },
                 new Tag { Name = "JavaScript" },
-                new Tag { Name = "C#" },
+                new Tag { Name = "CSharp" },
                 new Tag { Name = "C++" },
                 new Tag { Name = "Python" },
                 new Tag { Name = "PHP" }
