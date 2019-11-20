@@ -8,12 +8,12 @@
     <div class="Answer_Container">
         <div class="Answer_Vote">
             <div>
-                @if (!string.IsNullOrEmpty(ViewBag.userId) && ViewBag.userId != Model.answer.OwnerId)
+                @if (!string.IsNullOrEmpty(ViewBag.userId) && ViewBag.userId != Model.answer.OwnerId && !Model.answer.UpVotes.Any(u => u.userId == ViewBag.userId) && !Model.answer.DownVotes.Any(d => d.userId == ViewBag.userId))
                 {
                     Html.RenderPartial("VoteButton", new QaProject.Models.ButtonViewModel { Id = Model.answer.Id, UserId = ViewBag.userId, Type = "answer" });
                 }
             </div>
-            <p id="@("vote_count_answer_" + Model.answer.Id)">@(Model.answer.DownVotes.Count() - Model.answer.UpVotes.Count())</p>
+            <p id="@("vote_count_answer_" + Model.answer.Id)">@(Model.answer.UpVotes.Count() - Model.answer.DownVotes.Count())</p>
         </div>
         <div class="Answer_Content">@Model.answer.Content</div>
         <div class="Answer_AuthorCtn">

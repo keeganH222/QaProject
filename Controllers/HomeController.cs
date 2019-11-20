@@ -240,14 +240,18 @@ namespace QaProject.Controllers
             var tagList = qaLogic.HandleTagListLogic("Retrive list").ToList();
             return View(tagList);
         }
-        public ActionResult ListOfTagsQuestions(string tagName)
+        public ActionResult ListOfTagsQuestions(string tagName, int? page)
         {
             var tag = qaLogic.HandleGetTag(tagName);
             if (tag == null)
             {
                 return HttpNotFound();
             }
-            return View("MainPage", tag.Questions);
+            ViewBag.url = "ListOfTagsQuestions";
+            ViewBag.tagName = tagName;
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            return View("MainPage", tag.Questions.ToPagedList(pageNumber, pageSize));
         }
         public async Task<JsonResult> UpVoteItem(string itemType, string itemId, string userId)
         {

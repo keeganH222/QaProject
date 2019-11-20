@@ -23,37 +23,42 @@
     @Html.ActionLink("Today's Top Questions", "FilterTopQuestions")
 </div>
 <section>
-    @if(Model.Count() > 0)
+    @if (Model.Count() > 0)
     {
-        foreach(var item in Model)
+        foreach (var item in Model)
         {
-            <div class="Question_Container">
-                <div class="Question_Content">
-                    <h4>@item.Title</h4>
-                    <p>@item.Description</p>
-                </div>
-                <div class="Question_Author_Container">
-                    <p>@item.Owner.Reputation</p>
-                    <div class="Question_Author_placeHolder"></div>
-                    <p>@item.Owner.UserName</p>
-                </div>
-                @foreach(var tag in item.Tags)
-                {
-                    <span>
-                        @Html.ActionLink(tag.Name, "ListOfTagsQuestions", new { tagName = tag.Name });
-                    </span>
-                }
-            </div>
+    <div class="Question_Container">
+        <div class="Question_Content">
+            <h4>@item.Title</h4>
+            <p>@item.Description</p>
+        </div>
+        <div class="Question_Author_Container">
+            <p>@item.Owner.Reputation</p>
+            <div class="Question_Author_placeHolder"></div>
+            <p>@item.Owner.UserName</p>
+        </div>
+        @Html.ActionLink("Details", "Question", new { id = item.Id })
+        <div>
+            @foreach (var tag in item.Tags)
+            {
+                <span>
+                    @Html.ActionLink(tag.Name, "ListOfTagsQuestions", new { tagName = tag.Name });
+                </span>
+            }
+        </div>
+
+    </div>
         }
     }
 </section>
 Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
-
-@Html.PagedListPager(Model, page => Url.Action("Index",
+@if (!string.IsNullOrEmpty(ViewBag.tagName))
+{
+    @Html.PagedListPager(Model, page => Url.Action(ViewBag.url,
+    new { ViewBag.tagName, page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+}
+else
+{
+    @Html.PagedListPager(Model, page => Url.Action(ViewBag.url,
     new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
-
-<script>
-    jQuery(document).ready(function () {
-        $('#userTable').dataTable();
-    });
-</script>
+}

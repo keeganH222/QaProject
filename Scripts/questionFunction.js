@@ -91,7 +91,7 @@ function Display() {
             var x = document.createTextNode('x');
             button.append(x);
             button.setAttribute('data-name', name);
-            button.setAttribute('data-url', '@Url.Action("removeTag")');
+            button.setAttribute('data-url', 'removeTag');
             $(button).addClass('removeTag');
             span.append(button);
             $('#DisplayTags').append(span);
@@ -125,6 +125,8 @@ function changeVoteCount(voteType, itemId, itemType) {
         voteCnter -= 1;
     }
     voteElement.html(voteCnter);
+    $("#UpVotequestion" + itemId).addClass("hidden");
+    $("#DownVotequestion" + itemId).addClass("hidden");
 }
 function addComment(e) {
     let counter = $(this).data("count");
